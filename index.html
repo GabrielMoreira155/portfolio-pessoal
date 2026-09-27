@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gabriel Moreira | Tráfego pago e sites em Goiânia</title>
+<meta name="description" content="Eu trago o cliente pelo anúncio e construo o site onde ele chega. Gestão de tráfego no Meta Ads e Google Ads, sites, landing pages e automações. Goiânia, atendimento remoto.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f1f2f4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0b0d11" media="(prefers-color-scheme: dark)">
+
+<!-- Troque https://SEU-DOMINIO pelo endereço final do site (ex.: https://seuusuario.github.io) -->
+<link rel="canonical" href="https://SEU-DOMINIO/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:site_name" content="Gabriel Moreira">
+<meta property="og:title" content="Gabriel Moreira | Eu trago o cliente e construo o lugar onde ele chega">
+<meta property="og:description" content="Tráfego pago e sites com a mesma pessoa. Fica fácil achar onde o lead se perde.">
+<meta property="og:url" content="https://SEU-DOMINIO/">
+<meta property="og:image" content="https://SEU-DOMINIO/imagens/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Gabriel Moreira: eu trago o cliente e construo o lugar onde ele chega">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" href="imagens/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="imagens/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="imagens/apple-touch-icon.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+
+<!-- Three.js para o fundo animado da hero -->
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
+</head>
+<body>
+
+<div class="page-bg" aria-hidden="true"></div>
+
+<div class="frame">
+  <div class="guides" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+
+  <!-- HEADER -->
+  <header class="header">
+    <nav class="nav wrap" aria-label="Principal">
+      <a class="brand" href="#topo">Gabriel Moreira</a>
+      <div class="nav-links" id="menu">
+        <a href="#cases">Cases</a>
+        <a href="#projetos">Projetos</a>
+        <a href="#como-trabalho">Como trabalho</a>
+        <a href="#sobre">Sobre</a>
+        <a href="#contato">Contato</a>
+      </div>
+      <div class="nav-actions">
+        <a class="btn btn-primary btn-sm" data-whatsapp href="#contato">Falar comigo</a>
+        <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 8h16M4 16h16"/></svg>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <main id="topo">
+
+    <!-- HERO -->
+    <!-- hero-estatico: fundo de reserva até o WebGL carregar (ou se falhar) -->
+    <section class="hero hero-estatico">
+      <canvas class="hero-canvas" id="hero-canvas" aria-hidden="true"></canvas>
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <p class="chip"><span class="dot"></span>Tráfego pago e sites, Goiânia</p>
+          <h1>Eu atraio o cliente<br> e cuido do caminho<br> até ele chegar.</h1>
+          <p class="lead">Anúncios e site sob o mesmo cuidado. Assim, fica mais fácil entender onde as pessoas perdem o interesse e melhorar cada etapa.</p>
+          <div class="actions">
+            <a class="btn btn-primary" href="#cases">Ver cases
+              <svg class="arrow" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+            <a class="btn btn-ghost" href="#projetos">Ver projetos
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18M8 14h4"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Funil -->
+        <figure class="panel funnel-panel" aria-labelledby="funil-titulo">
+          <div class="panel-inner">
+            <div class="panel-head">
+              <div>
+                <p class="micro">Funil</p>
+                <p class="panel-title" id="funil-titulo">Do anúncio até a conversa</p>
+              </div>
+              <span class="chip chip-sm"><span class="dot dot-live"></span>Uma pessoa só</span>
+            </div>
+
+            <div class="funnel">
+              <div class="funnel-line" aria-hidden="true"><span class="funnel-runner"></span></div>
+
+              <div class="funnel-group">
+                <p class="group-label"><span class="tag tag-soft">Tráfego</span>Meta Ads e Google Ads</p>
+                <div class="stage" style="--w:100%; --i:0">
+                  <span class="marker"></span>
+                  <div class="stage-body"><div class="bar"><span>Impressão</span></div><small>Quem vê o anúncio</small></div>
+                </div>
+                <div class="stage" style="--w:76%; --i:1">
+                  <span class="marker"></span>
+                  <div class="stage-body"><div class="bar"><span>Clique</span></div><small>Quem se interessa e clica</small></div>
+                </div>
+              </div>
+
+              <div class="funnel-group">
+                <p class="group-label"><span class="tag tag-solid">Site</span>Site ou landing page</p>
+                <div class="stage stage-site" style="--w:56%; --i:2">
+                  <span class="marker"></span>
+                  <div class="stage-body"><div class="bar"><span>Site</span></div><small>Quem conhece a oferta</small></div>
+                </div>
+                <div class="stage stage-site stage-last" style="--w:40%; --i:3">
+                  <span class="marker"></span>
+                  <div class="stage-body"><div class="bar">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20.5l1.7-5.2A8.5 8.5 0 1 1 21 11.5Z"/></svg>
+                    <span>WhatsApp</span></div><small>Quem vira conversa</small></div>
+                </div>
+              </div>
+            </div>
+
+            <p class="panel-foot"><strong>Se o lead some no caminho, eu olho o funil inteiro, não só uma parte.</strong></p>
+          </div>
+        </figure>
+      </div>
+    </section>
+
+    <!-- NÚMEROS -->
+    <section class="stats" aria-label="Números">
+      <div class="wrap stats-grid" id="numeros"></div>
+    </section>
+
+    <!-- CASES -->
+    <section class="section" id="cases">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">01 · Cases de tráfego</p>
+            <h2>O que eu encontrei, o que eu fiz e o que mudou.</h2>
+          </div>
+          <p class="section-text">Dois exemplos reais contados do jeito que aconteceram. Sem print bonito de painel, só a situação, a decisão e o número.</p>
+        </div>
+        <div class="cases" id="lista-cases"></div>
+        <div class="segments">
+          <p>Também já atendi</p>
+          <ul id="lista-segmentos"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJETOS -->
+    <section class="section" id="projetos">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">02 · Projetos</p>
+            <h2>Sites, landing pages e automações que eu construí.</h2>
+          </div>
+          <p class="section-text">É aqui que o clique do anúncio vira cliente. Cada projeto tem o que foi usado e em que pé ele está.</p>
+        </div>
+        <div class="projects" id="lista-projetos"></div>
+      </div>
+    </section>
+
+    <!-- COMO TRABALHO -->
+    <section class="section" id="como-trabalho">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">03 · Como eu trabalho</p>
+            <h2>Quatro etapas, sempre na mesma ordem.</h2>
+          </div>
+          <p class="section-text">Primeiro eu entendo, depois arrumo o lugar onde o cliente chega, e só então coloco dinheiro em anúncio.</p>
+        </div>
+        <ol class="steps">
+          <li class="card step">
+            <span class="tag tag-soft">Etapa 01</span>
+            <h3>Diagnóstico</h3>
+            <p>Conversamos sobre o seu negócio, o que já foi feito de anúncio e para onde o cliente vai hoje depois do clique.</p>
+          </li>
+          <li class="card step">
+            <span class="tag tag-soft">Etapa 02</span>
+            <h3>Estrutura</h3>
+            <p>Se precisar, eu crio ou ajusto o site ou a landing page. Não adianta trazer gente para um lugar que não convence.</p>
+          </li>
+          <li class="card step">
+            <span class="tag tag-soft">Etapa 03</span>
+            <h3>Campanhas</h3>
+            <p>Monto as campanhas no Meta Ads e no Google Ads e acompanho de perto, ajustando conforme os números aparecem.</p>
+          </li>
+          <li class="card step">
+            <span class="tag tag-soft">Etapa 04</span>
+            <h3>Relatório mensal</h3>
+            <p>Todo mês você recebe um relatório simples: o que funcionou, o que não funcionou e qual é o próximo passo.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- SOBRE -->
+    <section class="section" id="sobre">
+      <div class="wrap about-grid">
+        <div>
+          <p class="eyebrow">04 · Sobre mim</p>
+          <h2>Prazer, Gabriel.</h2>
+          <div class="about-text">
+            <p>Tenho 21 anos, moro em Goiânia e estou no 7º período de Administração na PUC Goiás. Há 2 anos trabalho com tráfego pago no Meta Ads e no Google Ads, e nesse mesmo tempo passei a desenvolver sites, landing pages e automações usando o Claude Code.</p>
+            <p>Sou fundador da Virtus Apex, onde atendo negócios com tráfego pago, sites e automação. Aqui você fala direto comigo, do primeiro contato ao relatório.</p>
+            <p><a class="text-link" data-virtus href="#" target="_blank" rel="noopener">Conhecer a Virtus Apex</a></p>
+          </div>
+        </div>
+        <dl class="facts card">
+          <div><dt>Plataformas</dt><dd>Meta Ads, Google Ads</dd></div>
+          <div><dt>Desenvolvimento</dt><dd>Sites, landing pages, N8N</dd></div>
+          <div><dt>Idiomas</dt><dd>Português, inglês avançado</dd></div>
+          <div><dt>Base</dt><dd>Goiânia, atendimento remoto</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- CONTATO -->
+    <section class="section section-last" id="contato">
+      <div class="wrap">
+        <div class="cta card">
+          <div class="cta-copy">
+            <p class="eyebrow">05 · Contato</p>
+            <h2>Vamos ver onde seus clientes estão se perdendo?</h2>
+            <p class="section-text">Me chama no WhatsApp e me conta do seu negócio. A mensagem já vai pronta, é só enviar.</p>
+          </div>
+          <div class="cta-actions">
+            <a class="btn btn-primary btn-lg" data-whatsapp href="#" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20.5l1.7-5.2A8.5 8.5 0 1 1 21 11.5Z"/></svg>
+              Chamar no WhatsApp
+            </a>
+            <a class="btn btn-ghost btn-lg" data-instagram href="#" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6" fill="currentColor"/></svg>
+              <span data-instagram-handle>Instagram</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-row">
+      <p>© <span id="ano">2026</span> Gabriel Moreira</p>
+      <p>Goiânia, GO · Atendimento remoto</p>
+    </div>
+  </footer>
+</div>
+
+<script src="js/dados.js"></script>
+<script src="js/main.js"></script>
+<script src="js/hero-fundo.js"></script>
+</body>
+</html>
