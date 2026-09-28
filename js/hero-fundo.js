@@ -32,7 +32,7 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').match
 const isSmall = window.matchMedia('(max-width: 767px)').matches;
 
 const config = {
-  dpr: Math.min(window.devicePixelRatio, isSmall ? 1 : 1.5),
+  dpr: Math.min(window.devicePixelRatio, 1.5),
   exposure: 3.6505,
   bloomStrength: 0.2025,
   bloomRadius: 0.294,
@@ -95,8 +95,10 @@ let container;
 let running = true;
 let rafId = null;
 
-const getWidth = () => container.clientWidth;
-const getHeight = () => container.clientHeight;
+// Mede o próprio canvas (e não a hero): no celular o CSS limita o canvas a uma
+// faixa com proporção de tela, para a câmera enquadrar o piso e a parede.
+const getWidth = () => canvas.clientWidth;
+const getHeight = () => canvas.clientHeight;
 
 function init() {
   container = canvas.parentElement;
@@ -179,7 +181,7 @@ function init() {
   // Acompanha o tamanho real da hero (muda com a janela e com o conteúdo)
   // (o ResizeObserver já agrupa as mudanças uma vez por quadro)
   if ('ResizeObserver' in window) {
-    new ResizeObserver(onResize).observe(container);
+    new ResizeObserver(onResize).observe(canvas);
   } else {
     window.addEventListener('resize', onResize);
   }

@@ -322,6 +322,16 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 .hero-estatico::before { opacity: 1; }
 @media (max-width: 767px) {
   .hero-canvas.is-ready { opacity: 0.5; }
+  /* No celular a hero é alta e estreita (proporção ~0,3): com o canvas nela
+     inteira, a câmera só enxergava uma fatia fina da parede (riscos verticais).
+     O canvas vira uma faixa com proporção de tela atrás do texto e dos botões,
+     enquadrando o piso chegando na parede como no desktop, e some em degradê. */
+  .hero-canvas {
+    bottom: auto;
+    height: min(100%, 165vw);
+    -webkit-mask-image: linear-gradient(180deg, #000 78%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 78%, transparent 100%);
+  }
 }
 
 /* Título sempre em 3 linhas (quebras fixas no HTML), com tamanho que cresce
