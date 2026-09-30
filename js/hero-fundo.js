@@ -24,17 +24,15 @@
 const canvas = document.querySelector('#hero-canvas');
 if (!canvas) return;
 
-// Só começa o trabalho pesado (inclusive ler o Three.js) depois que a página
-// abriu, as animações de entrada terminaram e o navegador ficou ocioso. Até
-// lá a imagem de capa cobre o fundo, então visualmente nada muda.
+// Começa logo depois que a página aparece na tela (1º desenho), sem esperar o
+// carregamento completo. A preparação é leve e dividida em etapas, e as
+// animações de entrada (transform/opacity) continuam fluidas enquanto isso.
+// Esperar mais deixava a capa parada tempo demais, parecendo travado.
 function esperarOcioso() {
-  const carregou = document.readyState === 'complete'
-    ? Promise.resolve()
-    : new Promise((ok) => window.addEventListener('load', ok, { once: true }));
-  const entradaTerminou = new Promise((ok) => setTimeout(ok, Math.max(0, 1600 - performance.now())));
-  return Promise.all([carregou, entradaTerminou]).then(() => new Promise((ok) => {
-    if ('requestIdleCallback' in window) requestIdleCallback(() => ok(), { timeout: 1500 });
-    else setTimeout(ok, 300);
+  const primeiroDesenho = new Promise((ok) => requestAnimationFrame(() => requestAnimationFrame(ok)));
+  return primeiroDesenho.then(() => new Promise((ok) => {
+    if ('requestIdleCallback' in window) requestIdleCallback(() => ok(), { timeout: 200 });
+    else setTimeout(ok, 50);
   }));
 }
 await esperarOcioso();
