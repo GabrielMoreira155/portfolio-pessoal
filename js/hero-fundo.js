@@ -3,8 +3,11 @@
   Portado do design system Pulsedesk: trilhas de luz correndo sobre um piso
   que se curva em parede, com bloom e desfoque no primeiro plano.
   Otimizado para rodar leve sem mudar o visual nem o movimento:
-  - as 100 trilhas são UM objeto só (e os reflexos, outro): 2 desenhos por
-    quadro em vez de 200; cor, velocidade etc. de cada trilha vão por atributo
+  - as 100 trilhas são desenhadas por instâncias: UM tubo base que a placa de
+    vídeo repete 100 vezes (posição, espessura, cor e velocidade de cada uma
+    vão por atributo). 2 desenhos por quadro e quase nada de montagem na CPU
+  - sem travar a abertura: começa quando a página fica ociosa, divide o
+    trabalho em etapas e compila os shaders em paralelo (compileAsync)
   - 30 quadros por segundo (o movimento é lento, a diferença não aparece)
   - suavização FXAA (1 passada) no lugar do SMAA (3 passadas); MSAA foi
     testado e ficou MAIS lento em placa integrada (Intel UHD), então não usar
@@ -18,9 +21,27 @@
 // Script comum (não "module"): assim ele também roda abrindo o arquivo direto
 // do disco (file:///), onde o navegador bloqueia <script type="module">.
 // O Three.js vem do CDN via import() dinâmico, resolvido pelo importmap.
-let THREE, EffectComposer, RenderPass, UnrealBloomPass, ShaderPass, OutputPass, mergeGeometries, FXAAShader;
+const canvas = document.querySelector('#hero-canvas');
+if (!canvas) return;
+
+// Só começa o trabalho pesado (inclusive ler o Three.js) depois que a página
+// abriu, as animações de entrada terminaram e o navegador ficou ocioso. Até
+// lá a imagem de capa cobre o fundo, então visualmente nada muda.
+function esperarOcioso() {
+  const carregou = document.readyState === 'complete'
+    ? Promise.resolve()
+    : new Promise((ok) => window.addEventListener('load', ok, { once: true }));
+  const entradaTerminou = new Promise((ok) => setTimeout(ok, Math.max(0, 1600 - performance.now())));
+  return Promise.all([carregou, entradaTerminou]).then(() => new Promise((ok) => {
+    if ('requestIdleCallback' in window) requestIdleCallback(() => ok(), { timeout: 1500 });
+    else setTimeout(ok, 300);
+  }));
+}
+await esperarOcioso();
+
+let THREE, EffectComposer, RenderPass, UnrealBloomPass, ShaderPass, OutputPass, FXAAShader;
 try {
-  [THREE, { EffectComposer }, { RenderPass }, { UnrealBloomPass }, { ShaderPass }, { OutputPass }, { mergeGeometries }, { FXAAShader }] =
+  [THREE, { EffectComposer }, { RenderPass }, { UnrealBloomPass }, { ShaderPass }, { OutputPass }, { FXAAShader }] =
     await Promise.all([
       import('three'),
       import('three/addons/postprocessing/EffectComposer.js'),
@@ -28,7 +49,6 @@ try {
       import('three/addons/postprocessing/UnrealBloomPass.js'),
       import('three/addons/postprocessing/ShaderPass.js'),
       import('three/addons/postprocessing/OutputPass.js'),
-      import('three/addons/utils/BufferGeometryUtils.js'),
       import('three/addons/shaders/FXAAShader.js'),
     ]);
 } catch (e) {
@@ -36,7 +56,6 @@ try {
   return;
 }
 
-const canvas = document.querySelector('#hero-canvas');
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const isSmall = window.matchMedia('(max-width: 767px)').matches;
 
@@ -104,7 +123,7 @@ let scene, camera, renderer, composer, blurPass, floorMesh, fxaaPass;
 const clock = new THREE.Clock();
 let globalTime = 0;
 const trailObjects = [];
-let trailMesh, trailRefMesh;
+let trailMesh, trailRefMesh, outputPass;
 const trailMaterials = [];
 let container;
 let running = true;
@@ -115,7 +134,11 @@ let rafId = null;
 const getWidth = () => canvas.clientWidth;
 const getHeight = () => canvas.clientHeight;
 
-function init() {
+// Devolve o controle ao navegador (ele desenha a tela e roda as animações CSS)
+// antes de continuar. Evita uma única travada longa na abertura.
+const proximoQuadro = () => new Promise((ok) => requestAnimationFrame(() => setTimeout(ok, 0)));
+
+async function init() {
   container = canvas.parentElement;
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x000000);
@@ -124,11 +147,14 @@ function init() {
   camera.lookAt(0, 20, -50);
 
   // antialias do canvas não ajuda: a cena é desenhada no renderTarget abaixo
-  renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance' });
+  // 'default': em notebook com duas placas, pedir 'high-performance' força a
+  // troca para a placa dedicada, o que atrasa a abertura
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'default' });
   renderer.setSize(getWidth(), getHeight(), false);
   renderer.setPixelRatio(config.dpr);
   renderer.toneMapping = THREE.LinearToneMapping;
   renderer.toneMappingExposure = config.exposure;
+  await proximoQuadro();
 
   const renderTarget = new THREE.WebGLRenderTarget(getWidth() * config.dpr, getHeight() * config.dpr, {
     type: THREE.HalfFloatType,
@@ -194,11 +220,15 @@ function init() {
   fxaaPass = new ShaderPass(FXAAShader);
   fxaaPass.material.uniforms.resolution.value.set(1 / (getWidth() * config.dpr), 1 / (getHeight() * config.dpr));
   composer.addPass(fxaaPass);
-  composer.addPass(new OutputPass());
+  outputPass = new OutputPass();
+  composer.addPass(outputPass);
+  await proximoQuadro();
 
   createFloor();
   generateTrails();
   updateGeometries();
+  await proximoQuadro();
+  await aquecerShaders();
 
   // Acompanha o tamanho real da hero (muda com a janela e com o conteúdo)
   // (o ResizeObserver já agrupa as mudanças uma vez por quadro)
@@ -207,6 +237,49 @@ function init() {
   } else {
     window.addEventListener('resize', onResize);
   }
+}
+
+// Compila todos os shaders antes do 1º quadro, em paralelo (sem travar a
+// página), no mesmo "estado" em que serão usados de verdade: cena e efeitos
+// desenham em imagens intermediárias; só o OutputPass desenha na tela.
+async function aquecerShaders() {
+  // Sem compilação em paralelo no aparelho, não há ganho: compila no 1º quadro
+  if (!renderer.extensions.has('KHR_parallel_shader_compile')) return;
+  const alvo = composer.renderTarget1;
+  renderer.setRenderTarget(alvo);
+  await renderer.compileAsync(scene, camera);
+
+  const extras = new THREE.Scene();
+  const quad = new THREE.PlaneGeometry(2, 2);
+  const vistos = new Set();
+  const adicionar = (m) => {
+    if (!m || !m.isMaterial || vistos.has(m)) return;
+    vistos.add(m);
+    const mesh = new THREE.Mesh(quad, m);
+    mesh.frustumCulled = false;
+    extras.add(mesh);
+  };
+  composer.passes.forEach((pass) => {
+    if (pass === outputPass) return;
+    Object.values(pass).forEach((v) => [].concat(v).forEach(adicionar));
+  });
+  adicionar(composer.copyPass && composer.copyPass.material);
+  await renderer.compileAsync(extras, camera);
+
+  // OutputPass: monta os mesmos "defines" que ele montaria no 1º quadro
+  outputPass._outputColorSpace = renderer.outputColorSpace;
+  outputPass._toneMapping = renderer.toneMapping;
+  outputPass.material.defines = {};
+  if (THREE.ColorManagement.getTransfer(renderer.outputColorSpace) === THREE.SRGBTransfer) outputPass.material.defines.SRGB_TRANSFER = '';
+  if (renderer.toneMapping === THREE.LinearToneMapping) outputPass.material.defines.LINEAR_TONE_MAPPING = '';
+  outputPass.material.needsUpdate = true;
+  const saida = new THREE.Scene();
+  const meshSaida = new THREE.Mesh(quad, outputPass.material);
+  meshSaida.frustumCulled = false;
+  saida.add(meshSaida);
+  renderer.setRenderTarget(null);
+  await renderer.compileAsync(saida, camera);
+  quad.dispose();
 }
 
 function createFloor() {
@@ -221,6 +294,7 @@ function generateTrails() {
   // Cada trilha guarda seus valores próprios (cor, velocidade, deslocamento,
   // cauda) em atributos, para todas caberem num único objeto.
   const vertexShader = `
+    attribute vec2 aPos;   // x = posição lateral, y = espessura (raio) da trilha
     attribute vec3 aColor;
     attribute vec3 aTrail; // x = velocidade, y = deslocamento, z = cauda
     varying vec2 vUv;
@@ -232,8 +306,12 @@ function generateTrails() {
       vUv = uv;
       vColor = aColor;
       vTrail = aTrail;
+      // tubo base tem raio 1 e está em x = 0: volta ao eixo da curva e
+      // reaplica a espessura e a posição lateral desta trilha
+      vec3 eixo = position - normal;
+      vec3 pos = eixo + normal * aPos.y + vec3(aPos.x, 0.0, 0.0);
       vNormal = normalMatrix * normal;
-      vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+      vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
       vViewPosition = -mvPosition.xyz;
       gl_Position = projectionMatrix * mvPosition;
     }
@@ -327,7 +405,7 @@ function generateTrails() {
   trailRefMesh = new THREE.Mesh(new THREE.BufferGeometry(), refMaterial);
   trailRefMesh.scale.y = -1;
   trailRefMesh.position.y = -1.0;
-  // o objeto único cobre a cena toda; não vale a pena testar se está na tela
+  // as instâncias cobrem a cena toda; não vale a pena testar se estão na tela
   trailMesh.frustumCulled = trailRefMesh.frustumCulled = false;
   group.add(trailMesh, trailRefMesh);
   trailMaterials.push(material.uniforms, refMaterial.uniforms);
@@ -358,24 +436,25 @@ function updateGeometries() {
 
   const flat = Math.abs(config.floorLength - config.bendStartZ);
   const bendUv = flat / (flat + Math.PI * config.arcRadius * 0.5 + Math.max(0.1, config.wallHeight - config.arcRadius));
-  // Gera o tubo de cada trilha e junta todos num único objeto
-  const pedacos = trailObjects.map((obj) => {
-    const path = new CycCurve(obj.startX, config.floorLength, config.bendStartZ - config.arcRadius, config.arcRadius, config.wallHeight);
-    const geo = new THREE.TubeGeometry(path, 200, obj.thickness, 6, false);
-    const n = geo.attributes.position.count;
-    const cores = new Float32Array(n * 3);
-    const dados = new Float32Array(n * 3);
-    for (let v = 0; v < n; v++) {
-      cores[v * 3] = obj.color.r; cores[v * 3 + 1] = obj.color.g; cores[v * 3 + 2] = obj.color.b;
-      dados[v * 3] = obj.speed; dados[v * 3 + 1] = obj.offset; dados[v * 3 + 2] = obj.tail;
-    }
-    geo.setAttribute('aColor', new THREE.BufferAttribute(cores, 3));
-    geo.setAttribute('aTrail', new THREE.BufferAttribute(dados, 3));
-    return geo;
+  // Um único tubo base (raio 1, em x = 0); as 100 trilhas são instâncias dele
+  const base = new CycCurve(0, config.floorLength, config.bendStartZ - config.arcRadius, config.arcRadius, config.wallHeight);
+  const tubo = new THREE.TubeGeometry(base, 200, 1, 6, false);
+  const geo = new THREE.InstancedBufferGeometry().copy(tubo);
+  tubo.dispose();
+  const n = trailObjects.length;
+  const posTrilhas = new Float32Array(n * 2);
+  const cores = new Float32Array(n * 3);
+  const dados = new Float32Array(n * 3);
+  trailObjects.forEach((obj, i) => {
+    posTrilhas[i * 2] = obj.startX; posTrilhas[i * 2 + 1] = obj.thickness;
+    cores[i * 3] = obj.color.r; cores[i * 3 + 1] = obj.color.g; cores[i * 3 + 2] = obj.color.b;
+    dados[i * 3] = obj.speed; dados[i * 3 + 1] = obj.offset; dados[i * 3 + 2] = obj.tail;
   });
-  const geoUnica = mergeGeometries(pedacos);
-  pedacos.forEach((g) => g.dispose());
-  trailMesh.geometry = trailRefMesh.geometry = geoUnica;
+  geo.setAttribute('aPos', new THREE.InstancedBufferAttribute(posTrilhas, 2));
+  geo.setAttribute('aColor', new THREE.InstancedBufferAttribute(cores, 3));
+  geo.setAttribute('aTrail', new THREE.InstancedBufferAttribute(dados, 3));
+  geo.instanceCount = n;
+  trailMesh.geometry = trailRefMesh.geometry = geo;
   trailMaterials.forEach((u) => (u.uBendUv.value = bendUv));
 }
 
@@ -433,9 +512,9 @@ function fallbackEstatico() {
   canvas.remove();
 }
 
-if (canvas) {
+async function iniciar() {
   try {
-    init();
+    await init();
     canvas.addEventListener('webglcontextlost', fallbackEstatico);
     if (reduceMotion) {
       // Sem animação: desenha um quadro parado
@@ -452,7 +531,10 @@ if (canvas) {
       setRunning(true);
     }
   } catch (e) {
+    console.warn('Fundo animado indisponível, usando a imagem de capa:', e);
     fallbackEstatico();
   }
 }
+
+iniciar();
 })();
