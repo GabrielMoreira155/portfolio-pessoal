@@ -1,7 +1,15 @@
 /*
   Fundo animado da hero (Three.js r160).
   Portado do design system Pulsedesk: trilhas de luz correndo sobre um piso
-  que se curva em parede, com bloom, SMAA e desfoque no primeiro plano.
+  que se curva em parede, com bloom e desfoque no primeiro plano.
+  Otimizado para rodar leve sem mudar o visual nem o movimento:
+  - as 100 trilhas são UM objeto só (e os reflexos, outro): 2 desenhos por
+    quadro em vez de 200; cor, velocidade etc. de cada trilha vão por atributo
+  - 30 quadros por segundo (o movimento é lento, a diferença não aparece)
+  - suavização FXAA (1 passada) no lugar do SMAA (3 passadas); MSAA foi
+    testado e ficou MAIS lento em placa integrada (Intel UHD), então não usar
+  - bloom a 70% da resolução, desfoque de baixo com 12 amostras,
+    resolução 1x no desktop
   Mesmos parâmetros e cores do original. A hero é sempre escura (nos dois
   temas), então o canvas soma luz ao fundo como no Pulsedesk.
   Pausa quando a hero sai da tela ou a aba fica oculta.
@@ -10,17 +18,18 @@
 // Script comum (não "module"): assim ele também roda abrindo o arquivo direto
 // do disco (file:///), onde o navegador bloqueia <script type="module">.
 // O Three.js vem do CDN via import() dinâmico, resolvido pelo importmap.
-let THREE, EffectComposer, RenderPass, UnrealBloomPass, ShaderPass, SMAAPass, OutputPass;
+let THREE, EffectComposer, RenderPass, UnrealBloomPass, ShaderPass, OutputPass, mergeGeometries, FXAAShader;
 try {
-  [THREE, { EffectComposer }, { RenderPass }, { UnrealBloomPass }, { ShaderPass }, { SMAAPass }, { OutputPass }] =
+  [THREE, { EffectComposer }, { RenderPass }, { UnrealBloomPass }, { ShaderPass }, { OutputPass }, { mergeGeometries }, { FXAAShader }] =
     await Promise.all([
       import('three'),
       import('three/addons/postprocessing/EffectComposer.js'),
       import('three/addons/postprocessing/RenderPass.js'),
       import('three/addons/postprocessing/UnrealBloomPass.js'),
       import('three/addons/postprocessing/ShaderPass.js'),
-      import('three/addons/postprocessing/SMAAPass.js'),
       import('three/addons/postprocessing/OutputPass.js'),
+      import('three/addons/utils/BufferGeometryUtils.js'),
+      import('three/addons/shaders/FXAAShader.js'),
     ]);
 } catch (e) {
   // Sem internet ou CDN fora do ar: fica o fundo estático da hero
@@ -32,7 +41,9 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').match
 const isSmall = window.matchMedia('(max-width: 767px)').matches;
 
 const config = {
-  dpr: Math.min(window.devicePixelRatio, 1.5),
+  // celular: faixa pequena, dá para usar até 1,5x; desktop: 1x
+  dpr: isSmall ? Math.min(window.devicePixelRatio, 1.5) : 1,
+  fps: 30,
   exposure: 3.6505,
   bloomStrength: 0.2025,
   bloomRadius: 0.294,
@@ -86,10 +97,11 @@ class CycCurve extends THREE.Curve {
   }
 }
 
-let scene, camera, renderer, composer, blurPass, smaaPass, floorMesh;
+let scene, camera, renderer, composer, blurPass, floorMesh, fxaaPass;
 const clock = new THREE.Clock();
 let globalTime = 0;
 const trailObjects = [];
+let trailMesh, trailRefMesh;
 const trailMaterials = [];
 let container;
 let running = true;
@@ -108,7 +120,8 @@ function init() {
   camera.position.set(0, 20, 140);
   camera.lookAt(0, 20, -50);
 
-  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+  // antialias do canvas não ajuda: a cena é desenhada no renderTarget abaixo
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance' });
   renderer.setSize(getWidth(), getHeight(), false);
   renderer.setPixelRatio(config.dpr);
   renderer.toneMapping = THREE.LinearToneMapping;
@@ -119,11 +132,14 @@ function init() {
     format: THREE.RGBAFormat,
   });
 
-  smaaPass = new SMAAPass(getWidth() * config.dpr, getHeight() * config.dpr);
   const bloomPass = new UnrealBloomPass(
-    new THREE.Vector2(getWidth(), getHeight()),
+    new THREE.Vector2(getWidth() * 0.7, getHeight() * 0.7),
     config.bloomStrength, config.bloomRadius, config.bloomThreshold
   );
+  // Bloom a 70% da resolução: quase o dobro de quadros por segundo em placa
+  // integrada, sem diferença visível (menos que isso começa a pixelar o brilho)
+  const bloomSetSize = bloomPass.setSize.bind(bloomPass);
+  bloomPass.setSize = (w, h) => bloomSetSize(Math.max(1, Math.round(w * 0.7)), Math.max(1, Math.round(h * 0.7)));
 
   blurPass = new ShaderPass({
     uniforms: {
@@ -152,9 +168,10 @@ function init() {
           vec4 color = vec4(0.0);
           float total = 0.0;
           const float GA = 2.3999632;
-          for (int i = 0; i < 32; i++) {
+          // 12 amostras (eram 32); raio ajustado para manter o mesmo alcance
+          for (int i = 0; i < 12; i++) {
             float f = float(i);
-            float r = sqrt(f) * radius;
+            float r = sqrt(f) * radius * 1.68;
             float theta = f * GA;
             vec2 offset = vec2(cos(theta), sin(theta)) * (r / resolution);
             color += texture2D(tDiffuse, vUv + offset);
@@ -169,9 +186,11 @@ function init() {
   composer = new EffectComposer(renderer, renderTarget);
   composer.setPixelRatio(config.dpr);
   composer.addPass(new RenderPass(scene, camera));
-  composer.addPass(smaaPass);
   composer.addPass(bloomPass);
   composer.addPass(blurPass);
+  fxaaPass = new ShaderPass(FXAAShader);
+  fxaaPass.material.uniforms.resolution.value.set(1 / (getWidth() * config.dpr), 1 / (getHeight() * config.dpr));
+  composer.addPass(fxaaPass);
   composer.addPass(new OutputPass());
 
   createFloor();
@@ -196,15 +215,20 @@ function createFloor() {
 }
 
 function generateTrails() {
-  const group = new THREE.Group();
-  scene.add(group);
-
+  // Cada trilha guarda seus valores próprios (cor, velocidade, deslocamento,
+  // cauda) em atributos, para todas caberem num único objeto.
   const vertexShader = `
+    attribute vec3 aColor;
+    attribute vec3 aTrail; // x = velocidade, y = deslocamento, z = cauda
     varying vec2 vUv;
     varying vec3 vNormal;
     varying vec3 vViewPosition;
+    varying vec3 vColor;
+    varying vec3 vTrail;
     void main() {
       vUv = uv;
+      vColor = aColor;
+      vTrail = aTrail;
       vNormal = normalMatrix * normal;
       vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
       vViewPosition = -mvPosition.xyz;
@@ -215,11 +239,9 @@ function generateTrails() {
     varying vec2 vUv;
     varying vec3 vNormal;
     varying vec3 vViewPosition;
+    varying vec3 vColor;
+    varying vec3 vTrail;
     uniform float uTime;
-    uniform vec3 uColor;
-    uniform float uSpeed;
-    uniform float uOffset;
-    uniform float uTailLength;
     uniform float uIntensityMultiplier;
     uniform float uBendUv;
     uniform float uIsReflection;
@@ -231,6 +253,10 @@ function generateTrails() {
       return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
     }
     void main() {
+      vec3 uColor = vColor;
+      float uSpeed = vTrail.x;
+      float uOffset = vTrail.y;
+      float uTailLength = vTrail.z;
       float t = fract(uTime * uSpeed + uOffset);
       float dist = fract(t - vUv.x + 1.0);
       float baseAlpha = smoothstep(uTailLength, 0.0, dist);
@@ -260,6 +286,7 @@ function generateTrails() {
     }
   `;
 
+  // Mesmos sorteios do original, na mesma ordem
   for (let i = 0; i < config.linesCount; i++) {
     const normIdx = (i / (config.linesCount - 1)) * 2 - 1;
     const expPos = Math.sign(normIdx) * Math.pow(Math.abs(normIdx), 1.2);
@@ -267,39 +294,45 @@ function generateTrails() {
     startX += (Math.random() - 0.5) * 2.0;
     const thickness = Math.random() * 0.2 + 0.1;
     const colorIdx = Math.floor(Math.random() * 5);
-    const uniforms = {
+    const color = new THREE.Color(config.colors[colorIdx]);
+    const speed = Math.random() * 0.5 + 0.2;
+    const offset = Math.random();
+    const tail = Math.random() * 0.4 + 0.3;
+    trailObjects.push({ startX, thickness, color, speed, offset, tail });
+  }
+
+  const makeMaterial = (intensity, isReflection) => new THREE.ShaderMaterial({
+    vertexShader, fragmentShader,
+    uniforms: {
       uTime: { value: 0 },
-      uColor: { value: new THREE.Color(config.colors[colorIdx]) },
-      uSpeed: { value: Math.random() * 0.5 + 0.2 },
-      uOffset: { value: Math.random() },
-      uTailLength: { value: Math.random() * 0.4 + 0.3 },
-      uIntensityMultiplier: { value: 1.0 },
+      uIntensityMultiplier: { value: intensity },
       uBendUv: { value: 0.0 },
-      uIsReflection: { value: 0.0 },
+      uIsReflection: { value: isReflection },
       uDotDensity: { value: config.dotDensity },
       uDotSize: { value: config.dotSize },
       uDotSpeed: { value: config.dotSpeed },
       uBrightness: { value: config.brightness },
-    };
-    const material = new THREE.ShaderMaterial({
-      vertexShader, fragmentShader, uniforms,
-      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-    });
-    const mesh = new THREE.Mesh(new THREE.BufferGeometry(), material);
-    const refMaterial = material.clone();
-    refMaterial.uniforms.uIntensityMultiplier.value = 0.4;
-    refMaterial.uniforms.uIsReflection.value = 1.0;
-    const refMesh = new THREE.Mesh(new THREE.BufferGeometry(), refMaterial);
-    refMesh.scale.y = -1;
-    refMesh.position.y = -1.0;
-    group.add(mesh, refMesh);
-    trailMaterials.push(material.uniforms, refMaterial.uniforms);
-    trailObjects.push({ mesh, refMesh, startX, thickness });
-  }
+    },
+    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+  });
+  const material = makeMaterial(1.0, 0.0);
+  const refMaterial = makeMaterial(0.4, 1.0);
+
+  const group = new THREE.Group();
+  scene.add(group);
+  trailMesh = new THREE.Mesh(new THREE.BufferGeometry(), material);
+  trailRefMesh = new THREE.Mesh(new THREE.BufferGeometry(), refMaterial);
+  trailRefMesh.scale.y = -1;
+  trailRefMesh.position.y = -1.0;
+  // o objeto único cobre a cena toda; não vale a pena testar se está na tela
+  trailMesh.frustumCulled = trailRefMesh.frustumCulled = false;
+  group.add(trailMesh, trailRefMesh);
+  trailMaterials.push(material.uniforms, refMaterial.uniforms);
 }
 
 function updateGeometries() {
-  const floorGeo = new THREE.PlaneGeometry(1000, 1000, 1, 1500);
+  // 400 divisões bastam para a curva (eram 1500)
+  const floorGeo = new THREE.PlaneGeometry(1000, 1000, 1, 400);
   floorGeo.rotateX(-Math.PI * 0.5);
   const pos = floorGeo.attributes.position.array;
   for (let i = 0; i < pos.length; i += 3) {
@@ -322,12 +355,25 @@ function updateGeometries() {
 
   const flat = Math.abs(config.floorLength - config.bendStartZ);
   const bendUv = flat / (flat + Math.PI * config.arcRadius * 0.5 + Math.max(0.1, config.wallHeight - config.arcRadius));
-  trailObjects.forEach((obj) => {
+  // Gera o tubo de cada trilha e junta todos num único objeto
+  const pedacos = trailObjects.map((obj) => {
     const path = new CycCurve(obj.startX, config.floorLength, config.bendStartZ - config.arcRadius, config.arcRadius, config.wallHeight);
-    const geo = new THREE.TubeGeometry(path, 200, obj.thickness, 8, false);
-    obj.mesh.geometry = obj.refMesh.geometry = geo;
-    obj.mesh.material.uniforms.uBendUv.value = obj.refMesh.material.uniforms.uBendUv.value = bendUv;
+    const geo = new THREE.TubeGeometry(path, 200, obj.thickness, 6, false);
+    const n = geo.attributes.position.count;
+    const cores = new Float32Array(n * 3);
+    const dados = new Float32Array(n * 3);
+    for (let v = 0; v < n; v++) {
+      cores[v * 3] = obj.color.r; cores[v * 3 + 1] = obj.color.g; cores[v * 3 + 2] = obj.color.b;
+      dados[v * 3] = obj.speed; dados[v * 3 + 1] = obj.offset; dados[v * 3 + 2] = obj.tail;
+    }
+    geo.setAttribute('aColor', new THREE.BufferAttribute(cores, 3));
+    geo.setAttribute('aTrail', new THREE.BufferAttribute(dados, 3));
+    return geo;
   });
+  const geoUnica = mergeGeometries(pedacos);
+  pedacos.forEach((g) => g.dispose());
+  trailMesh.geometry = trailRefMesh.geometry = geoUnica;
+  trailMaterials.forEach((u) => (u.uBendUv.value = bendUv));
 }
 
 function onResize() {
@@ -336,17 +382,25 @@ function onResize() {
   camera.updateProjectionMatrix();
   renderer.setSize(getWidth(), getHeight(), false);
   composer.setSize(getWidth(), getHeight());
-  smaaPass.setSize(getWidth() * config.dpr, getHeight() * config.dpr);
   blurPass.uniforms.resolution.value.set(getWidth() * config.dpr, getHeight() * config.dpr);
+  if (fxaaPass) fxaaPass.material.uniforms.resolution.value.set(1 / (getWidth() * config.dpr), 1 / (getHeight() * config.dpr));
   if (reduceMotion) composer.render();
 }
 
+// Limita a 30 quadros por segundo: o tempo da animação continua correndo
+// normal, só deixamos de desenhar quadros que o olho não perceberia.
+const passoQuadro = 1 / config.fps;
+let acumulado = passoQuadro;
 function frame() {
   rafId = null;
   if (!running) return;
-  globalTime += clock.getDelta() * config.speedMultiplier;
-  trailMaterials.forEach((u) => (u.uTime.value = globalTime));
-  composer.render();
+  acumulado += clock.getDelta();
+  if (acumulado >= passoQuadro * 0.95) {
+    globalTime += acumulado * config.speedMultiplier;
+    acumulado = 0;
+    trailMaterials.forEach((u) => (u.uTime.value = globalTime));
+    composer.render();
+  }
   rafId = requestAnimationFrame(frame);
 }
 

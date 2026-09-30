@@ -123,9 +123,11 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 .btn-ghost:hover { transform: scale(1.02); border-color: var(--text-3); background: var(--surface-2); }
 .btn:active { transform: scale(0.98); }
 /* Na hero escura, o botão secundário é de vidro, como no Pulsedesk */
-.hero .btn-ghost { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.1); color: #e2e8f0; backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); box-shadow: 0 25px 50px -12px rgba(0,0,0,.2); }
+/* Sem backdrop-filter sobre a animação: desfocar um fundo animado a cada
+   quadro é caro. Fundo escuro quase opaco no lugar do vidro. */
+.hero .btn-ghost { background: rgba(18,18,20,.85); border-color: rgba(255,255,255,.1); color: #e2e8f0; box-shadow: 0 25px 50px -12px rgba(0,0,0,.2); }
 .hero .btn-ghost:hover { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.18); }
-.hero .chip { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.08); color: #cbd5e1; backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
+.hero .chip { background: rgba(18,18,20,.85); border-color: rgba(255,255,255,.08); color: #cbd5e1; }
 
 .chip {
   display: inline-flex; align-items: center; gap: 8px;
@@ -194,6 +196,8 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
   --accent-line: rgba(198, 241, 53, 0.5);
   color: var(--text);
 }
+/* Sobre a hero animada: sem desfoque de fundo (caro), fundo preto sólido */
+.header.sobre-hero { background: rgba(0, 0, 0, 0.92); backdrop-filter: none; -webkit-backdrop-filter: none; }
 .nav { display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 16px; }
 .brand { font-family: var(--font-display); font-weight: 700; font-size: 18px; letter-spacing: -0.03em; text-decoration: none; }
 .nav-links { display: none; gap: 28px; }
@@ -263,15 +267,16 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
   left: 50%; top: 96px; width: 288px; height: 288px; transform: translateX(-50%);
   border-radius: 50%; background: rgba(165, 243, 252, 0.1); filter: blur(64px);
 }
-.hero .panel { backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); background: rgba(0, 0, 0, 0.75); border-color: rgba(255, 255, 255, 0.15); }
+.hero .panel { background: rgba(0, 0, 0, 0.92); border-color: rgba(255, 255, 255, 0.15); }
 .hero .panel-inner { background: #000; }
 
-/* Fundo WebGL (trilhas de luz do Pulsedesk), somando luz ao fundo escuro */
+/* Fundo WebGL (trilhas de luz do Pulsedesk). Sem mix-blend-mode: o fundo da
+   cena já é preto, então "screen" sobre preto dava o mesmo resultado, só que
+   obrigando o navegador a misturar a hero inteira a cada quadro. */
 .hero-canvas {
   position: absolute; inset: 0; z-index: 0;
   width: 100%; height: 100%;
   pointer-events: none;
-  mix-blend-mode: screen;
   opacity: 0;
   transition: opacity 1.2s ease-out;
 }
