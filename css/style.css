@@ -2,36 +2,38 @@
    Gabriel Moreira · Portfólio
    Estrutura herdada do design system Pulsedesk (moldura com
    linhas-guia, cabeçalhos numerados, cards com filete de luz,
-   botões pílula, painel de mockup), com paleta clara em
-   azul cobalto e modo escuro automático.
+   botões pílula, painel de mockup). Site sempre no modo escuro,
+   com verde-limão como cor de destaque.
    ========================================================== */
 
 :root {
-  --bg: #f1f2f4;
-  --bg-glow: rgba(23, 71, 199, 0.07);
-  --surface: #ffffff;
-  --surface-2: #f6f7f9;
-  --surface-3: #eceef2;
-  --line: rgba(17, 20, 24, 0.08);
-  --line-2: rgba(17, 20, 24, 0.14);
-  --guide: rgba(17, 20, 24, 0.045);
-  --text: #111418;
-  --text-2: #464d5a;
-  --text-3: #6b7280;
-  --accent: #1747c7;
-  --accent-hover: #123aa6;
-  --accent-ink: #ffffff;
-  --accent-soft: rgba(23, 71, 199, 0.08);
-  --accent-soft-2: rgba(23, 71, 199, 0.16);
-  --accent-line: rgba(23, 71, 199, 0.45);
-  --ok: #0f7a4d;
-  --ok-soft: rgba(15, 122, 77, 0.1);
-  --warn: #9a5b00;
-  --warn-soft: rgba(154, 91, 0, 0.1);
-  --ph: #fff1a8;
-  --ph-text: #5b4a00;
-  --shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset, 0 1px 2px rgba(17, 20, 24, 0.04), 0 12px 32px -12px rgba(17, 20, 24, 0.12);
-  --shadow-lg: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 30px 80px -30px rgba(17, 20, 24, 0.28);
+  color-scheme: dark;
+  --bg: #0b0d11;
+  --bg-glow: rgba(198, 241, 53, 0.05);
+  --surface: #12151b;
+  --surface-2: #161a21;
+  --surface-3: #1c2129;
+  --line: rgba(255, 255, 255, 0.07);
+  --line-2: rgba(255, 255, 255, 0.13);
+  --guide: rgba(255, 255, 255, 0.035);
+  --text: #eef0f4;
+  --text-2: #aab1be;
+  --text-3: #7f8797;
+  /* verde-limão: fundo de botões com texto preto, e textos de destaque */
+  --accent: #c6f135;
+  --accent-hover: #d6f868;
+  --accent-ink: #0a0a0a;
+  --accent-soft: rgba(198, 241, 53, 0.1);
+  --accent-soft-2: rgba(198, 241, 53, 0.22);
+  --accent-line: rgba(198, 241, 53, 0.5);
+  --ok: #5fcf9a;
+  --ok-soft: rgba(95, 207, 154, 0.12);
+  --warn: #e8b454;
+  --warn-soft: rgba(232, 180, 84, 0.12);
+  --ph: rgba(255, 214, 10, 0.18);
+  --ph-text: #ffe27a;
+  --shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 18px 40px -18px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 40px 90px -30px rgba(0, 0, 0, 0.8);
 
   --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
   --font-body: "Public Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -43,36 +45,6 @@
   --pad: 20px;
   --maxw: 1280px;
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0b0d11;
-    --bg-glow: rgba(96, 130, 255, 0.1);
-    --surface: #12151b;
-    --surface-2: #161a21;
-    --surface-3: #1c2129;
-    --line: rgba(255, 255, 255, 0.07);
-    --line-2: rgba(255, 255, 255, 0.13);
-    --guide: rgba(255, 255, 255, 0.035);
-    --text: #eef0f4;
-    --text-2: #aab1be;
-    --text-3: #7f8797;
-    --accent: #7b98ff;
-    --accent-hover: #9bb1ff;
-    --accent-ink: #0b0d11;
-    --accent-soft: rgba(123, 152, 255, 0.1);
-    --accent-soft-2: rgba(123, 152, 255, 0.2);
-    --accent-line: rgba(123, 152, 255, 0.5);
-    --ok: #5fcf9a;
-    --ok-soft: rgba(95, 207, 154, 0.12);
-    --warn: #e8b454;
-    --warn-soft: rgba(232, 180, 84, 0.12);
-    --ph: rgba(255, 214, 10, 0.18);
-    --ph-text: #ffe27a;
-    --shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 18px 40px -18px rgba(0, 0, 0, 0.6);
-    --shadow-lg: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 40px 90px -30px rgba(0, 0, 0, 0.8);
-  }
 }
 
 /* ---------- Base ---------- */
@@ -216,10 +188,10 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
   --line-2: rgba(255, 255, 255, 0.14);
   --text: #f1f5f9;
   --text-2: #94a3b8;
-  --accent: #7b98ff;
-  --accent-hover: #9bb1ff;
-  --accent-ink: #080c14;
-  --accent-line: rgba(123, 152, 255, 0.5);
+  --accent: #c6f135;
+  --accent-hover: #d6f868;
+  --accent-ink: #0a0a0a;
+  --accent-line: rgba(198, 241, 53, 0.5);
   color: var(--text);
 }
 .nav { display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 16px; }
@@ -270,12 +242,12 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
   --text: #f1f5f9;
   --text-2: #94a3b8;
   --text-3: #64748b;
-  --accent: #7b98ff;
-  --accent-hover: #9bb1ff;
-  --accent-ink: #080c14;
-  --accent-soft: rgba(123, 152, 255, 0.1);
-  --accent-soft-2: rgba(123, 152, 255, 0.22);
-  --accent-line: rgba(123, 152, 255, 0.5);
+  --accent: #c6f135;
+  --accent-hover: #d6f868;
+  --accent-ink: #0a0a0a;
+  --accent-soft: rgba(198, 241, 53, 0.1);
+  --accent-soft-2: rgba(198, 241, 53, 0.22);
+  --accent-line: rgba(198, 241, 53, 0.5);
   --shadow-lg: 0 1px 1px rgba(255, 255, 255, 0.08) inset, 0 40px 100px -20px rgba(0, 0, 0, 0.8);
   position: relative; overflow: hidden; isolation: isolate;
   padding: 56px 0 72px;
