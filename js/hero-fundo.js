@@ -59,6 +59,9 @@ const config = {
   floorLength: 132.75,
   wallHeight: 200.0,
   brightness: 4.0131,
+  // ATENÇÃO: imagens/hero-poster.webp é um quadro desta animação (capa que
+  // aparece enquanto ela carrega). Se mudar cores, câmera ou parâmetros aqui,
+  // gere uma capa nova para a troca continuar sem "pulo".
   // Trilhas em preto e branco (tons de cinza com o mesmo brilho das originais).
   // Cores originais do Pulsedesk (azul-ciano):
   // ['#080c14', '#0ea5e9', '#22d3ee', '#ffffff', '#0b1220']
@@ -400,6 +403,7 @@ function frame() {
     acumulado = 0;
     trailMaterials.forEach((u) => (u.uTime.value = globalTime));
     composer.render();
+    mostrarAnimacao();
   }
   rafId = requestAnimationFrame(frame);
 }
@@ -413,10 +417,19 @@ function setRunning(state) {
   }
 }
 
-// Sem WebGL: some com o canvas e volta ao fundo estático da hero (CSS)
+// Só troca a capa pela animação depois que o 1º quadro foi desenhado de fato
+let animacaoVisivel = false;
+function mostrarAnimacao() {
+  if (animacaoVisivel) return;
+  animacaoVisivel = true;
+  canvas.classList.add('is-ready');
+  canvas.closest('.hero')?.classList.add('animacao-pronta');
+}
+
+// Sem WebGL: some com o canvas e a capa (imagem estática) volta a aparecer
 function fallbackEstatico() {
   running = false;
-  canvas.closest('.hero')?.classList.add('hero-estatico');
+  canvas.closest('.hero')?.classList.remove('animacao-pronta');
   canvas.remove();
 }
 
@@ -424,12 +437,11 @@ if (canvas) {
   try {
     init();
     canvas.addEventListener('webglcontextlost', fallbackEstatico);
-    canvas.classList.add('is-ready');
-    canvas.closest('.hero')?.classList.remove('hero-estatico');
     if (reduceMotion) {
       // Sem animação: desenha um quadro parado
       trailMaterials.forEach((u) => (u.uTime.value = 0.35));
       composer.render();
+      mostrarAnimacao();
     } else {
       let visible = true;
       new IntersectionObserver(([entry]) => {

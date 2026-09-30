@@ -273,37 +273,34 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 /* Fundo WebGL (trilhas de luz do Pulsedesk). Sem mix-blend-mode: o fundo da
    cena já é preto, então "screen" sobre preto dava o mesmo resultado, só que
    obrigando o navegador a misturar a hero inteira a cada quadro. */
-.hero-canvas {
+.hero-canvas,
+.hero-poster {
   position: absolute; inset: 0; z-index: 0;
   width: 100%; height: 100%;
   pointer-events: none;
-  opacity: 0;
-  transition: opacity 1.2s ease-out;
+  transition: opacity 0.35s ease-out;
 }
+.hero-canvas { opacity: 0; }
 .hero-canvas.is-ready { opacity: 0.6; }
 
-/* Fundo estático de reserva: aparece enquanto o WebGL carrega e fica
-   se ele falhar (sem suporte, CDN fora do ar ou contexto perdido).
-   Imita o ponto de fuga das trilhas com brilhos azul-ciano. */
-.hero::before {
-  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
-  background:
-    radial-gradient(60% 45% at 50% 100%, rgba(34, 211, 238, 0.16), transparent 70%),
-    radial-gradient(30% 60% at 45% 35%, rgba(14, 165, 233, 0.12), transparent 70%),
-    repeating-linear-gradient(90deg, transparent 0 46px, rgba(34, 211, 238, 0.05) 46px 47px);
-  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 45%, #000 100%);
-  mask-image: linear-gradient(180deg, transparent 0%, #000 45%, #000 100%);
-  opacity: 0;
-  transition: opacity 1.2s ease-out;
+/* Capa: quadro real da animação (já com a opacidade 0,6 do canvas aplicada).
+   A câmera tem abertura vertical fixa, então encaixar a imagem pela ALTURA e
+   centralizar reproduz o mesmo enquadramento do canvas em qualquer largura.
+   Some quando a animação ao vivo desenha o 1º quadro (classe no js). Se o
+   WebGL falhar ou o Three.js não carregar, ela continua como fundo estático. */
+.hero-poster {
+  background: #000 url("../imagens/hero-poster.webp") center top / auto 100% no-repeat;
 }
-.hero-estatico::before { opacity: 1; }
+.hero.animacao-pronta .hero-poster { opacity: 0; }
 @media (max-width: 767px) {
   .hero-canvas.is-ready { opacity: 0.5; }
+  .hero-poster { opacity: 0.83; } /* 0,5 / 0,6: mesma intensidade do canvas no celular */
   /* No celular a hero é alta e estreita (proporção ~0,3): com o canvas nela
      inteira, a câmera só enxergava uma fatia fina da parede (riscos verticais).
      O canvas vira uma faixa com proporção de tela atrás do texto e dos botões,
      enquadrando o piso chegando na parede como no desktop, e some em degradê. */
-  .hero-canvas {
+  .hero-canvas,
+  .hero-poster {
     bottom: auto;
     height: min(100%, 165vw);
     -webkit-mask-image: linear-gradient(180deg, #000 78%, transparent 100%);
