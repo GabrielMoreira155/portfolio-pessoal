@@ -227,6 +227,7 @@ async function init() {
   updateGeometries();
   await proximoQuadro();
   await aquecerShaders();
+  await aquecerPasses();
 
   // Acompanha o tamanho real da hero (muda com a janela e com o conteúdo)
   // (o ResizeObserver já agrupa as mudanças uma vez por quadro)
@@ -278,6 +279,18 @@ async function aquecerShaders() {
   renderer.setRenderTarget(null);
   await renderer.compileAsync(saida, camera);
   quad.dispose();
+}
+
+// O 1º desenho completo é caro porque a placa de vídeo cria de uma vez todas
+// as imagens intermediárias dos efeitos. Aqui cada efeito desenha uma vez,
+// em quadros separados, enquanto o canvas ainda está invisível (atrás da capa).
+async function aquecerPasses() {
+  const leitura = composer.renderTarget1;
+  const escrita = composer.renderTarget2;
+  for (const pass of composer.passes) {
+    pass.render(renderer, escrita, leitura, 0, false);
+    await proximoQuadro();
+  }
 }
 
 function createFloor() {
