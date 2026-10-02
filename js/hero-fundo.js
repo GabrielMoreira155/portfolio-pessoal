@@ -18,8 +18,10 @@
   - as 100 trilhas são instâncias de UM tubo base (2 desenhos por quadro)
   - shaders compilados em paralelo (compileAsync) e cada efeito "aquecido" num
     quadro separado antes da animação aparecer
+  - resolução interna limitada a ~700 mil pixels (em 1920x1080, ~68%): sem
+    isso a placa integrada saturava e o Chrome inteiro engasgava
   - 30 quadros por segundo; FXAA no lugar do SMAA (MSAA ficou MAIS lento na
-    Intel UHD, não usar); bloom a 70%; desfoque com 12 amostras; 1x no desktop
+    Intel UHD, não usar); bloom a 70%; desfoque com 12 amostras
   Pausa quando a hero sai da tela ou a aba fica oculta.
 */
 (function () {
@@ -98,8 +100,16 @@ function motor(porta) {
 
   function criarConfig(dpr, celular) {
     return {
-      // celular: faixa pequena, dá para usar até 1,5x; desktop: 1x
-      dpr: celular ? Math.min(dpr, 1.5) : 1,
+      // Orçamento de pixels por quadro: a animação é desenhada com no máximo
+      // ~700 mil pixels e ampliada na tela. Em 1920x1080 isso dá ~68% da
+      // resolução; sem esse limite a animação saturava a placa de vídeo
+      // integrada (Intel UHD) e o Chrome INTEIRO caía para ~20 telas/s, com
+      // engasgos de até 0,3 s (medido). Como a cena é feita de brilho e
+      // desfoque, a diferença visual é mínima.
+      orcamentoPixels: 700000,
+      // limite superior: celular (faixa pequena) até 1,5x; desktop até 1x
+      dprMax: celular ? Math.min(dpr, 1.5) : 1,
+      dpr: 1,
       fps: 30,
       exposure: 3.6505,
       bloomStrength: 0.2025,
@@ -449,10 +459,22 @@ function motor(porta) {
     trailMaterials.forEach((u) => (u.uBendUv.value = bendUv));
   }
 
+  // Escala da resolução interna conforme o tamanho do canvas (orçamento de pixels)
+  function calcularEscala() {
+    const porPixel = Math.sqrt(config.orcamentoPixels / Math.max(1, largura * altura));
+    return Math.max(0.4, Math.min(config.dprMax, porPixel));
+  }
+
   function aplicarTamanho() {
     if (!largura || !altura || !renderer) return;
     camera.aspect = largura / altura;
     camera.updateProjectionMatrix();
+    const escala = calcularEscala();
+    if (Math.abs(escala - config.dpr) > 0.02) {
+      config.dpr = escala;
+      renderer.setPixelRatio(escala);
+      composer.setPixelRatio(escala);
+    }
     renderer.setSize(largura, altura, false);
     composer.setSize(largura, altura);
     blurPass.uniforms.resolution.value.set(largura * config.dpr, altura * config.dpr);
@@ -495,10 +517,11 @@ function motor(porta) {
   porta.onmessage = async (evento) => {
     const m = evento.data || {};
     if (m.tipo === 'testar') {
-      // Testa o WebGL2 aqui dentro (criar um contexto WebGL na thread principal
-      // custava ~300 ms de travada na página)
-      let ok = false;
-      try { ok = typeof OffscreenCanvas !== 'undefined' && !!new OffscreenCanvas(1, 1).getContext('webgl2'); } catch (e) { ok = false; }
+      // Só verifica se o WebGL2 existe aqui dentro, sem criar um contexto de
+      // teste: criar contexto ocupa a placa de vídeo (e na thread principal
+      // custava ~300 ms de travada). Se mesmo assim o WebGL falhar depois, o
+      // motor avisa "falhou" e a capa fica.
+      const ok = typeof OffscreenCanvas !== 'undefined' && typeof WebGL2RenderingContext !== 'undefined';
       porta.postMessage({ tipo: 'suporte', ok });
     } else if (m.tipo === 'iniciar') {
       canvas = m.canvas;
@@ -506,6 +529,7 @@ function motor(porta) {
       altura = Math.max(1, m.altura);
       reduzir = !!m.reduzir;
       config = criarConfig(m.dpr || 1, !!m.celular);
+      config.dpr = calcularEscala();
       passoQuadro = 1 / config.fps;
       acumulado = passoQuadro;
       running = m.rodar !== false;
@@ -630,26 +654,32 @@ function iniciarNoWorker() {
   worker.postMessage({ tipo: 'testar' });
 }
 
-// Reserva: sem suporte a worker com WebGL, roda o mesmo motor na página,
-// esperando a página aparecer na tela antes do trabalho pesado.
+// Reserva: sem suporte a worker com WebGL, roda o mesmo motor na página.
 function iniciarNaPagina() {
   const porta = { onmessage: null, postMessage: (m) => receber(m) };
   motor(porta);
   enviar = (m) => porta.onmessage({ data: m });
-  const comecar = () => {
-    enviar(dadosIniciais(canvas));
-    ligarObservadores();
-  };
+  enviar(dadosIniciais(canvas));
+  ligarObservadores();
+}
+
+// A placa de vídeo é compartilhada com o resto do Chrome: o worker só começa
+// a criar o WebGL e compilar shaders depois que a 1ª tela da página já
+// apareceu e o navegador ficou ocioso (a capa cobre o fundo até lá). Antes,
+// os dois disputavam a placa e a abertura ficava parada por até ~0,6 s.
+function depoisDaPrimeiraTela(fn) {
   requestAnimationFrame(() => requestAnimationFrame(() => {
-    if ('requestIdleCallback' in window) requestIdleCallback(comecar, { timeout: 200 });
-    else setTimeout(comecar, 50);
+    if ('requestIdleCallback' in window) requestIdleCallback(fn, { timeout: 600 });
+    else setTimeout(fn, 100);
   }));
 }
 
-try {
-  if (temOffscreenCanvas()) iniciarNoWorker();
-  else iniciarNaPagina();
-} catch (e) {
-  fallbackEstatico(e);
-}
+depoisDaPrimeiraTela(() => {
+  try {
+    if (temOffscreenCanvas()) iniciarNoWorker();
+    else iniciarNaPagina();
+  } catch (e) {
+    fallbackEstatico(e);
+  }
+});
 })();
