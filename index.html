@@ -32,8 +32,6 @@
 <link rel="preload" href="fontes/public-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="css/style.css">
 
-<!-- Imagem de fundo da hero (trilhas de luz): aparece na hora -->
-<link rel="preload" as="image" href="imagens/hero-poster.webp" type="image/webp" fetchpriority="high">
 
 </head>
 <body>
@@ -67,9 +65,8 @@
 
     <!-- HERO -->
     <section class="hero">
-      <!-- Fundo: imagem das trilhas de luz + pulsos de luz animados só com CSS -->
-      <div class="hero-poster" aria-hidden="true"></div>
-      <div class="hero-luzes" id="hero-luzes" aria-hidden="true"></div>
+      <!-- Fundo limpo: grade fina e brilhos estáticos (só CSS) -->
+      <div class="hero-fundo" aria-hidden="true"><div class="hero-piso"></div></div>
       <div class="wrap hero-grid">
         <div class="hero-copy">
           <p class="chip"><span class="dot"></span>Tráfego pago e sites, Goiânia</p>
@@ -260,6 +257,5 @@
 
 <script src="js/dados.js"></script>
 <script src="js/main.js"></script>
-<script src="js/hero-luzes.js"></script>
 </body>
 </html>

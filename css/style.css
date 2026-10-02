@@ -291,76 +291,66 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 .hero .panel { background: rgba(0, 0, 0, 0.92); border-color: rgba(255, 255, 255, 0.15); }
 .hero .panel-inner { background: #000; }
 
-/* Fundo da hero: imagem das trilhas de luz (um quadro real da cena 3D do
-   Pulsedesk, com brilho e reflexo) + pulsos de luz correndo por cima delas.
-   Antes era uma animação WebGL ao vivo, mas na placa de vídeo integrada ela
-   saturava a GPU e o Chrome inteiro engasgava. Os pulsos usam só transform e
-   opacity: rodam no compositor, sem ocupar a página nem a placa de vídeo.
-   A câmera tem abertura vertical fixa, então encaixar a imagem pela ALTURA e
-   centralizar mantém o mesmo enquadramento em qualquer largura (o js usa a
-   mesma conta para posicionar os pulsos em cima das trilhas da imagem). */
-.hero-poster,
-.hero-luzes {
-  position: absolute; inset: 0; z-index: 0;
-  width: 100%; height: 100%;
-  pointer-events: none;
+/* Fundo da hero: limpo e sem animação, só efeitos estáticos (custo zero por
+   quadro): grade fina no estilo do Pulsedesk que some em direção às bordas,
+   brilho verde-limão atrás do card, luz branca sutil no alto e escurecimento
+   nas bordas e na base para a hero se fundir com o resto da página. */
+.hero-fundo {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    /* luz branca sutil no alto, à esquerda (atrás do título) */
+    radial-gradient(60% 55% at 22% 0%, rgba(255, 255, 255, 0.10), transparent 70%),
+    /* brilho verde-limão atrás do card do funil */
+    radial-gradient(42% 60% at 76% 50%, rgba(198, 241, 53, 0.17), transparent 72%),
+    /* escurece as laterais e a base */
+    radial-gradient(120% 90% at 50% 30%, transparent 55%, rgba(0, 0, 0, 0.75) 100%),
+    #000;
 }
-.hero-poster {
-  background: #000 url("../imagens/hero-poster.webp") center top / auto 100% no-repeat;
+/* grade fina, mais visível no centro e sumindo nas bordas */
+.hero-fundo::before {
+  content: ""; position: absolute; inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 56px 56px;
+  background-position: center top;
+  -webkit-mask-image: radial-gradient(70% 75% at 55% 40%, #000 0%, rgba(0, 0, 0, 0.35) 55%, transparent 85%);
+  mask-image: radial-gradient(70% 75% at 55% 40%, #000 0%, rgba(0, 0, 0, 0.35) 55%, transparent 85%);
 }
-.hero-luzes { overflow: hidden; }
-
-/* Trilho: linha invisível girada na direção da trilha (posição e ângulo vêm
-   do js). O pulso anda "para cima" dentro dele. */
-.trilho {
-  position: absolute; width: 0; height: 0;
-  transform: rotate(var(--angulo));
+/* Piso em perspectiva: a mesma grade deitada, indo para o horizonte na parte
+   de baixo da hero (referência à cena 3D de antes, mas parada: o navegador
+   desenha uma vez e não há custo depois). */
+.hero-piso {
+  position: absolute; left: -50%; right: -50%; bottom: 0; height: 110%;
+  background-image:
+    linear-gradient(to right, rgba(198, 241, 53, 0.3) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.2) 1px, transparent 1px);
+  background-size: 80px 80px;
+  background-position: center bottom;
+  transform: perspective(900px) rotateX(62deg);
+  transform-origin: 50% 100%;
+  -webkit-mask-image: linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.6) 35%, transparent 75%);
+  mask-image: linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.6) 35%, transparent 75%);
 }
-.pulso {
-  position: absolute; left: calc(var(--largura) / -2); top: 0;
-  width: var(--largura); height: var(--cauda);
-  border-radius: 2px;
-  /* cabeça brilhante em cima, cauda longa sumindo para baixo */
-  background: linear-gradient(to top, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.12) 45%, rgba(255, 255, 255, 0.6) 88%, #fff 100%);
-  transform-origin: 50% 0;
-  opacity: 0;
-  animation: var(--duracao) linear var(--atraso) infinite;
+/* linha de luz na base da hero, fazendo a transição para a seção seguinte */
+.hero-fundo::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(198, 241, 53, 0.35) 50%, transparent);
 }
-/* No piso o pulso se afasta da câmera: rápido perto, devagar longe, e
-   diminuindo (pontos calculados com a perspectiva da câmera original).
-   Ocupa os primeiros 60% do ciclo; nos 40% restantes o pulso da parede sobe. */
-.pulso-piso { animation-name: pulso-piso; }
-.pulso-parede { animation-name: pulso-parede; }
-@keyframes pulso-piso {
-  0%     { transform: translateY(0) scale(1);                                 opacity: 0; }
-  3%     {                                                                     opacity: var(--brilho); }
-  6%     { transform: translateY(calc(var(--comprimento) * -0.446)) scale(0.615); }
-  15%    { transform: translateY(calc(var(--comprimento) * -0.707)) scale(0.39); }
-  30%    { transform: translateY(calc(var(--comprimento) * -0.879)) scale(0.242); }
-  45%    { transform: translateY(calc(var(--comprimento) * -0.956)) scale(0.176); }
-  60%    { transform: translateY(calc(var(--comprimento) * -1)) scale(0.138);  opacity: var(--brilho); }
-  61%, 100% { transform: translateY(calc(var(--comprimento) * -1)) scale(0.138); opacity: 0; }
-}
-@keyframes pulso-parede {
-  0%, 59% { transform: translateY(0) scale(0.138);                              opacity: 0; }
-  61%     {                                                                      opacity: var(--brilho); }
-  96%     {                                                                      opacity: var(--brilho); }
-  100%    { transform: translateY(calc(var(--comprimento) * -1)) scale(0.138);  opacity: 0; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .hero-luzes { display: none; }
-}
-@media (max-width: 767px) {
-  .hero-poster { opacity: 0.83; }
-  /* No celular a hero é alta e estreita: o fundo vira uma faixa com proporção
-     de tela atrás do texto e dos botões (enquadra o piso chegando na parede)
-     e some em degradê. */
-  .hero-poster,
-  .hero-luzes {
-    bottom: auto;
-    height: min(100%, 165vw);
-    -webkit-mask-image: linear-gradient(180deg, #000 78%, transparent 100%);
-    mask-image: linear-gradient(180deg, #000 78%, transparent 100%);
+@media (max-width: 1199px) {
+  /* empilhado: o card fica embaixo, então o brilho verde vai junto */
+  .hero-fundo {
+    background:
+      radial-gradient(80% 35% at 30% 0%, rgba(255, 255, 255, 0.07), transparent 70%),
+      radial-gradient(70% 30% at 50% 78%, rgba(198, 241, 53, 0.10), transparent 72%),
+      radial-gradient(130% 90% at 50% 30%, transparent 55%, rgba(0, 0, 0, 0.75) 100%),
+      #000;
+  }
+  .hero-piso { height: 70%; }
+  .hero-fundo::before {
+    background-size: 44px 44px;
+    -webkit-mask-image: radial-gradient(90% 60% at 50% 35%, #000 0%, rgba(0, 0, 0, 0.35) 55%, transparent 85%);
+    mask-image: radial-gradient(90% 60% at 50% 35%, #000 0%, rgba(0, 0, 0, 0.35) 55%, transparent 85%);
   }
 }
 
@@ -384,18 +374,6 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
   .hero .actions { margin-top: 22px; }
 }
 
-/* Layout empilhado (celular, tablet e notebook até 1199px): texto em cima,
-   card embaixo. A animação continua na hero inteira e uma sombra preta suave
-   atrás do bloco de texto garante a leitura por cima das trilhas. */
-@media (max-width: 1199px) {
-  .hero-copy { position: relative; isolation: isolate; }
-  .hero-copy::before {
-    content: ""; position: absolute; z-index: -1; pointer-events: none;
-    inset: -48px calc(-1 * var(--pad)) -56px;
-    background: radial-gradient(ellipse 70% 62% at 38% 50%,
-      rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.6) 55%, transparent 100%);
-  }
-}
 @media (min-width: 768px) and (max-width: 1199px) {
   .hero .funnel-panel { max-width: 760px; }
 }
@@ -406,9 +384,7 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 /* Desktop (a partir de 1200px): texto ao lado do card. */
 @media (min-width: 1200px) {
   .hero-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 500px); gap: 80px; }
-  /* Tamanho do texto calculado para caber na área livre à esquerda da
-     parede de luz (medida com a animação renderizada em 1200, 1280, 1440
-     e 1920px), sem mexer na animação */
+  /* Tamanho do texto no desktop (lado a lado com o card) */
   .hero .hero-copy h1 { font-size: clamp(2.3rem, 3.5vw, 3.3rem); }
   .hero .hero-copy .lead { max-width: min(24rem, 30vw); font-size: 17px; margin-top: 18px; }
   .hero .hero-copy .actions { margin-top: 28px; }
@@ -421,8 +397,6 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
   .hero .funnel-panel { margin-right: -48px; }
 }
 .lead { margin-top: 22px; max-width: 34rem; font-size: 18px; line-height: 1.65; color: var(--text-2); }
-/* Garante leitura quando uma trilha clara passa atrás do texto */
-.hero h1, .hero .lead { text-shadow: 0 1px 2px rgba(8, 12, 20, 0.6), 0 0 18px rgba(8, 12, 20, 0.85); }
 .hero .lead { color: #aebbd0; }
 .actions { margin-top: 32px; display: flex; flex-wrap: wrap; gap: 12px; }
 @media (max-width: 480px) { .actions .btn { flex: 1 1 100%; } }
