@@ -291,20 +291,30 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 .hero .panel { background: rgba(0, 0, 0, 0.92); border-color: rgba(255, 255, 255, 0.15); }
 .hero .panel-inner { background: #000; }
 
-/* Fundo da hero: limpo e sem animação, só efeitos estáticos (custo zero por
-   quadro): grade fina no estilo do Pulsedesk que some em direção às bordas,
-   brilho verde-limão atrás do card, luz branca sutil no alto e escurecimento
-   nas bordas e na base para a hero se fundir com o resto da página. */
+/* Fundo da hero: grade fina no estilo do Pulsedesk que some em direção às
+   bordas, brilho verde-limão atrás do card (respirando devagar), luz branca
+   sutil no alto, piso em perspectiva com pulsos de luz correndo para o
+   horizonte ("fluxo": clientes avançando pelo funil) e escurecimento nas
+   bordas. Animações só de transform e opacity (rodam no compositor, sem
+   pesar na página nem na placa de vídeo). */
 .hero-fundo {
   position: absolute; inset: 0; z-index: 0; pointer-events: none;
   background:
     /* luz branca sutil no alto, à esquerda (atrás do título) */
     radial-gradient(60% 55% at 22% 0%, rgba(255, 255, 255, 0.10), transparent 70%),
-    /* brilho verde-limão atrás do card do funil */
-    radial-gradient(42% 60% at 76% 50%, rgba(198, 241, 53, 0.17), transparent 72%),
     /* escurece as laterais e a base */
     radial-gradient(120% 90% at 50% 30%, transparent 55%, rgba(0, 0, 0, 0.75) 100%),
     #000;
+}
+/* brilho verde-limão atrás do card, "respirando" devagar */
+.hero-brilho {
+  position: absolute; inset: 0;
+  background: radial-gradient(42% 60% at 76% 50%, rgba(198, 241, 53, 0.19), transparent 72%);
+  animation: respirar 9s ease-in-out infinite;
+}
+@keyframes respirar {
+  0%, 100% { opacity: 0.6; }
+  50%      { opacity: 1; }
 }
 /* grade fina, mais visível no centro e sumindo nas bordas */
 .hero-fundo::before {
@@ -332,6 +342,36 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
   -webkit-mask-image: linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.6) 35%, transparent 75%);
   mask-image: linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.6) 35%, transparent 75%);
 }
+/* Fluxo: pulsos de luz correndo pelas linhas do piso até o horizonte.
+   Ficam numa camada própria, FORA do piso (dentro dele, com a máscara, o
+   navegador repintava o piso a cada quadro). Cada pulso carrega a mesma
+   perspectiva do piso, com a mesma origem (centro da base), então corre
+   exatamente sobre a linha da grade (a cada 80px do centro, índice --k no
+   HTML) e diminui ao se afastar. Só transform e opacity: roda no compositor. */
+.hero-fluxos { position: absolute; left: -50%; right: -50%; bottom: 0; height: 110%; }
+.fluxo {
+  position: absolute; bottom: 0; width: 3px; height: 240px;
+  left: calc(50% - 41px + var(--k) * 80px);
+  /* cabeça clara no topo, cauda longa sumindo para trás */
+  background: linear-gradient(to top,
+    rgba(198, 241, 53, 0) 0, rgba(198, 241, 53, 0.2) 110px,
+    rgba(198, 241, 53, 0.95) 234px, #f4ffd1 240px);
+  transform-origin: calc(41px - var(--k) * 80px) 100%;
+  transform: perspective(900px) rotateX(62deg) translateY(40%);
+  opacity: 0;
+  animation: fluir var(--dur, 8s) linear var(--atraso, 0s) infinite;
+}
+@keyframes fluir {
+  0%   { transform: perspective(900px) rotateX(62deg) translateY(40%);   opacity: 0; }
+  8%   {                                                                  opacity: 1; }
+  35%  {                                                                  opacity: 0.7; }
+  85%  {                                                                  opacity: 0; }
+  100% { transform: perspective(900px) rotateX(62deg) translateY(-190%); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-brilho { animation: none; opacity: 0.85; }
+  .fluxo { display: none; }
+}
 /* linha de luz na base da hero, fazendo a transição para a seção seguinte */
 .hero-fundo::after {
   content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
@@ -342,11 +382,13 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
   .hero-fundo {
     background:
       radial-gradient(80% 35% at 30% 0%, rgba(255, 255, 255, 0.07), transparent 70%),
-      radial-gradient(70% 30% at 50% 78%, rgba(198, 241, 53, 0.10), transparent 72%),
       radial-gradient(130% 90% at 50% 30%, transparent 55%, rgba(0, 0, 0, 0.75) 100%),
       #000;
   }
-  .hero-piso { height: 70%; }
+  .hero-brilho {
+    background: radial-gradient(70% 30% at 50% 78%, rgba(198, 241, 53, 0.12), transparent 72%);
+  }
+  .hero-piso, .hero-fluxos { height: 70%; }
   .hero-fundo::before {
     background-size: 44px 44px;
     -webkit-mask-image: radial-gradient(90% 60% at 50% 35%, #000 0%, rgba(0, 0, 0, 0.35) 55%, transparent 85%);
@@ -430,12 +472,17 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
   position: absolute; left: 30px; top: 66px; bottom: 44px; width: 2px;
   background: repeating-linear-gradient(180deg, var(--line-2) 0 4px, transparent 4px 8px);
 }
+/* o corredor ocupa a altura da linha, com o ponto no topo; desce com
+   translateY (só compositor; animar "top" repintava a página a cada quadro) */
 .funnel-runner {
-  position: absolute; left: 50%; top: 0; width: 8px; height: 8px; margin-left: -4px;
-  border-radius: 50%; background: var(--accent);
-  box-shadow: 0 0 0 4px var(--accent-soft-2);
+  position: absolute; left: 50%; top: 0; bottom: 0; width: 8px; margin-left: -4px;
   opacity: 0;
   animation: run 4.8s var(--ease) 1.6s infinite;
+}
+.funnel-runner::before {
+  content: ""; position: absolute; left: 0; top: -4px; width: 8px; height: 8px;
+  border-radius: 50%; background: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft-2);
 }
 .funnel-group { display: grid; gap: 10px; }
 .group-label { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-3); padding-left: 28px; }
@@ -462,21 +509,28 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 .bar span { animation: fade .5s ease-out both; animation-delay: calc(var(--i) * 140ms + 650ms); }
 .bar svg { flex: none; }
 
-.dot-live { animation: pulse 2.4s ease-in-out infinite; }
+/* anel pulsando em volta do ponto: scale e opacity num pseudo-elemento
+   (animar box-shadow repintava a cada quadro) */
+.dot-live { position: relative; }
+.dot-live::after {
+  content: ""; position: absolute; inset: -3px; border-radius: 50%;
+  background: var(--accent-soft-2);
+  animation: pulse 2.4s ease-in-out infinite;
+}
 
 @keyframes grow { from { transform: scaleX(0.08); opacity: 0; } to { transform: scaleX(1); opacity: 1; } }
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes run {
-  0% { top: 0; opacity: 0; }
+  0% { transform: translateY(0); opacity: 0; }
   8% { opacity: 1; }
   82% { opacity: 1; }
-  100% { top: 100%; opacity: 0; }
+  100% { transform: translateY(100%); opacity: 0; }
 }
-@keyframes pulse { 0%, 100% { box-shadow: 0 0 0 3px var(--accent-soft); } 50% { box-shadow: 0 0 0 6px var(--accent-soft); } }
+@keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.5); opacity: 1; } }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .bar, .bar span, .funnel-runner, .dot-live { animation: none !important; }
+  .bar, .bar span, .funnel-runner, .dot-live::after { animation: none !important; }
   .funnel-runner { display: none; }
 }
 
