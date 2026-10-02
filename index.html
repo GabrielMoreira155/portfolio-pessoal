@@ -32,7 +32,7 @@
 <link rel="preload" href="fontes/public-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="css/style.css">
 
-<!-- Imagem de capa da hero: aparece na hora, enquanto a animação prepara -->
+<!-- Imagem de fundo da hero (trilhas de luz): aparece na hora -->
 <link rel="preload" as="image" href="imagens/hero-poster.webp" type="image/webp" fetchpriority="high">
 
 </head>
@@ -67,10 +67,9 @@
 
     <!-- HERO -->
     <section class="hero">
-      <!-- Capa: um quadro real da animação, aparece na hora. A animação ao vivo
-           assume assim que desenha o 1º quadro. Se o WebGL falhar, a capa fica. -->
+      <!-- Fundo: imagem das trilhas de luz + pulsos de luz animados só com CSS -->
       <div class="hero-poster" aria-hidden="true"></div>
-      <canvas class="hero-canvas" id="hero-canvas" aria-hidden="true"></canvas>
+      <div class="hero-luzes" id="hero-luzes" aria-hidden="true"></div>
       <div class="wrap hero-grid">
         <div class="hero-copy">
           <p class="chip"><span class="dot"></span>Tráfego pago e sites, Goiânia</p>
@@ -261,6 +260,6 @@
 
 <script src="js/dados.js"></script>
 <script src="js/main.js"></script>
-<script src="js/hero-fundo.js"></script>
+<script src="js/hero-luzes.js"></script>
 </body>
 </html>
