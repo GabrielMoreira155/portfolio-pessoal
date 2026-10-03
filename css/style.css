@@ -453,11 +453,11 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 
 /* Título sempre em 3 linhas (quebras fixas no HTML), com tamanho que cresce
    aos poucos: celular 31 a 41px, tablet e notebook pequeno 41 a 46px,
-   desktop 42 a 53px. A linha mais longa ("e cuido do caminho") tem 8,3em. */
+   desktop 42 a 53px. A linha mais longa ("transformar visitas") tem ~8,8em. */
 .hero h1 {
   margin-top: 22px;
   font-size: clamp(1.95rem, 9.7vw, 2.55rem);
-  max-width: 8.6em;
+  max-width: 9.4em;
   line-height: 0.98; letter-spacing: -0.045em; font-weight: 700;
 }
 @media (min-width: 768px) {
@@ -483,11 +483,10 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
   .hero-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 500px); gap: 80px; }
   /* Tamanho do texto no desktop (lado a lado com o card) */
   .hero .hero-copy h1 { font-size: clamp(2.3rem, 3.5vw, 3.3rem); }
-  .hero .hero-copy .lead { max-width: min(24rem, 30vw); font-size: 17px; margin-top: 18px; }
+  .hero .hero-copy .lead { max-width: min(28rem, 32vw); font-size: 17px; margin-top: 18px; }
   .hero .hero-copy .actions { margin-top: 28px; }
-  /* texto acima do topo do card e um pouco para a esquerda
-     (avança sobre a margem conforme a tela tem espaço sobrando) */
-  .hero-copy { align-self: start; margin-top: -56px; margin-left: calc(-1 * clamp(16px, (100vw - 1280px) / 2, 56px)); }
+  /* texto centralizado na altura do card e um pouco mais para o meio */
+  .hero-copy { align-self: center; margin-left: clamp(0px, (100vw - 1280px) / 4, 48px); }
 }
 /* em telas largas o card avança um pouco sobre a margem direita */
 @media (min-width: 1440px) {
