@@ -452,12 +452,13 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 }
 
 /* Título sempre em 3 linhas (quebras fixas no HTML), com tamanho que cresce
-   aos poucos: celular 31 a 41px, tablet e notebook pequeno 41 a 46px,
-   desktop 42 a 53px. A linha mais longa ("transformar visitas") tem ~8,8em. */
+   aos poucos: celular 30 a 41px, tablet e notebook pequeno 41 a 46px,
+   desktop 42 a 53px. A linha mais longa ("que trabalham juntos") tem ~9,4em,
+   então o tamanho no celular acompanha a largura (9vw) para não quebrar. */
 .hero h1 {
   margin-top: 22px;
-  font-size: clamp(1.95rem, 9.7vw, 2.55rem);
-  max-width: 9.4em;
+  font-size: clamp(1.85rem, 8.6vw, 2.55rem);
+  max-width: 10em;
   line-height: 0.98; letter-spacing: -0.045em; font-weight: 700;
 }
 @media (min-width: 768px) {
@@ -471,22 +472,39 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
   .hero .actions { margin-top: 22px; }
 }
 
+/* Empilhado (texto, botões e funil): funil mais perto dos botões */
+@media (max-width: 1199px) {
+  .hero-grid { gap: 40px; }
+}
 @media (min-width: 768px) and (max-width: 1199px) {
-  .hero .funnel-panel { max-width: 760px; }
+  .hero .funnel-panel { max-width: 640px; }
 }
 
 @media (min-width: 1024px) {
-  .hero { padding: 88px 0 104px; }
+  .hero { padding: 72px 0 88px; }
 }
 /* Desktop (a partir de 1200px): texto ao lado do card. */
 @media (min-width: 1200px) {
-  .hero-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 500px); gap: 80px; }
+  /* menos altura em cima para o card inteiro caber na primeira dobra */
+  .hero { padding: 48px 0 72px; }
+  .hero-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 480px); gap: 72px; }
   /* Tamanho do texto no desktop (lado a lado com o card) */
   .hero .hero-copy h1 { font-size: clamp(2.3rem, 3.5vw, 3.3rem); }
   .hero .hero-copy .lead { max-width: min(28rem, 32vw); font-size: 17px; margin-top: 18px; }
   .hero .hero-copy .actions { margin-top: 28px; }
   /* texto centralizado na altura do card e um pouco mais para o meio */
   .hero-copy { align-self: center; margin-left: clamp(0px, (100vw - 1280px) / 4, 48px); }
+}
+/* A partir do tablet o card tem largura de sobra: descrição ao lado da barra
+   (e não embaixo). O funil fica ~90px mais baixo e, no desktop, cabe inteiro
+   na primeira dobra de um notebook. */
+@media (min-width: 768px) {
+  .hero .funnel { gap: 18px; }
+  .hero .marker { margin-top: 9px; }
+  .hero .funnel-line { top: 80px; bottom: 44px; }
+  .hero .stage-body { display: flex; align-items: center; gap: 12px; }
+  .hero .bar { height: 40px; flex: none; width: calc(var(--w) * 0.5 + 45px); min-width: max-content; }
+  .hero .stage-body small { margin-top: 0; white-space: nowrap; }
 }
 /* em telas largas o card avança um pouco sobre a margem direita */
 @media (min-width: 1440px) {
@@ -496,6 +514,12 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 .hero .lead { color: #aebbd0; }
 .actions { margin-top: 32px; display: flex; flex-wrap: wrap; gap: 12px; }
 @media (max-width: 480px) { .actions .btn { flex: 1 1 100%; } }
+/* Na hero os dois botões cabem lado a lado até ~350px */
+@media (max-width: 480px) {
+  .hero .actions { gap: 10px; }
+  .hero .actions .btn { flex: 1 1 0; min-width: 0; padding: 0 14px; }
+}
+@media (max-width: 349px) { .hero .actions .btn { flex: 1 1 100%; } }
 
 /* Painel (moldura dupla do mockup Pulsedesk) */
 .panel {
@@ -523,8 +547,13 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 /* ---------- Funil ---------- */
 .funnel { position: relative; padding: 22px 20px 24px 20px; display: grid; gap: 22px; }
 .funnel-line {
-  position: absolute; left: 30px; top: 66px; bottom: 44px; width: 2px;
-  background: repeating-linear-gradient(180deg, var(--line-2) 0 4px, transparent 4px 8px);
+  position: absolute; left: 30px; top: 82px; bottom: 71px; width: 2px;
+  /* vai do centro do 1º marcador ao centro do último */
+  /* tracejado sobre um degradê: cinza no anúncio, verde na conversa,
+     para ler como um caminho só */
+  background:
+    repeating-linear-gradient(180deg, transparent 0 4px, var(--surface) 4px 8px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.16), var(--accent-line));
 }
 /* o corredor ocupa a altura da linha, com o ponto no topo; desce com
    translateY (só compositor; animar "top" repintava a página a cada quadro) */
@@ -562,6 +591,22 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 .stage-site .bar { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .bar span { animation: fade .5s ease-out both; animation-delay: calc(var(--i) * 140ms + 650ms); }
 .bar svg { flex: none; }
+
+/* Celular: funil mais baixo e menos denso, mesmo conteúdo */
+@media (max-width: 639px) {
+  .hero .panel { padding: 6px; }
+  .hero .panel-head { padding: 12px 14px; }
+  .hero .panel-title { font-size: 14px; }
+  .funnel { padding: 16px 14px 18px; gap: 14px; }
+  .funnel-group { gap: 8px; }
+  .group-label { font-size: 12px; gap: 8px; }
+  .funnel-line { left: 23px; top: 70px; bottom: 58px; }
+  .stage { grid-template-columns: 20px 1fr; gap: 8px; }
+  .marker { width: 20px; height: 20px; margin-top: 8px; }
+  .bar { height: 36px; min-width: 118px; padding: 0 12px; border-radius: 12px; font-size: 14px; }
+  .stage-body small { margin-top: 3px; font-size: 12px; }
+  .hero .panel-foot { padding: 12px 14px; font-size: 12.5px; }
+}
 
 /* anel pulsando em volta do ponto: scale e opacity num pseudo-elemento
    (animar box-shadow repintava a cada quadro) */
