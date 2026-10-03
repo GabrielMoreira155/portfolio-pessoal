@@ -19,12 +19,12 @@ window.DADOS = {
     virtusApex: "[link da Virtus Apex]",
   },
 
-  // Faixa de números logo abaixo do hero
+  // Faixa de números logo abaixo do hero. Mesmo formato em todos:
+  // área (rótulo pequeno), número e o que ele significa.
   numeros: [
-    { valor: "+118,8%", texto: "de melhora nos resultados de uma campanha de Meta Ads" },
-    { valor: "6", texto: "segmentos atendidos" },
-    { valor: "R$ 2.000", prefixo: "Até", texto: "de orçamento mensal gerido" },
-    { valor: "7 dias", prefixo: "Até", texto: "para entregar um site depois de receber os materiais" },
+    { area: "Tráfego pago", valor: "+118,8%", texto: "de melhora numa campanha de Meta Ads que já rodava e passou para as minhas mãos" },
+    { area: "Clientes", valor: "6", texto: "segmentos de negócio diferentes atendidos" },
+    { area: "Sites", valor: "7 dias", texto: "no máximo para entregar um site depois de receber os materiais" },
   ],
 
   // Cases de tráfego. Formato: Situação / O que eu fiz / Resultado

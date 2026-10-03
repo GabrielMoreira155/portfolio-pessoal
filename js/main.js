@@ -61,7 +61,7 @@
     numeros.innerHTML = D.numeros.map(function (n) {
       return (
         '<div class="stat">' +
-          '<span class="stat-pre">' + txt(n.prefixo || "") + "</span>" +
+          '<span class="stat-pre">' + txt(n.area || n.prefixo || "") + "</span>" +
           '<strong class="stat-value">' + txt(n.valor) + "</strong>" +
           '<p class="stat-text">' + txt(n.texto) + "</p>" +
         "</div>"
