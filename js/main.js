@@ -170,6 +170,39 @@
     window.addEventListener("resize", atualizarHeader);
   }
 
+  // Brilho que segue o mouse na hero. Move só com transform (sem repintar)
+  // e persegue o cursor com um leve atraso; para quando alcança.
+  var luz = document.querySelector(".hero-mouse");
+  if (luz && hero && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    var alvoX = 0, alvoY = 0, x = 0, y = 0, rodando = false, primeira = true;
+    var heroX = 0, heroY = 0; // posição da hero na página (medida fora do movimento)
+    var suave = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var medirHero = function () {
+      var r = hero.getBoundingClientRect();
+      heroX = r.left + window.scrollX; heroY = r.top + window.scrollY;
+    };
+    var passo = function () {
+      var k = suave ? 0.16 : 1;
+      x += (alvoX - x) * k; y += (alvoY - y) * k;
+      if (Math.abs(alvoX - x) < 0.3 && Math.abs(alvoY - y) < 0.3) { x = alvoX; y = alvoY; rodando = false; }
+      luz.style.transform = "translate3d(" + x + "px," + y + "px,0)";
+      if (rodando) requestAnimationFrame(passo);
+    };
+    medirHero();
+    window.addEventListener("resize", medirHero);
+    window.addEventListener("load", medirHero);
+    hero.addEventListener("pointerenter", medirHero);
+    hero.addEventListener("pointermove", function (e) {
+      alvoX = e.pageX - heroX; alvoY = e.pageY - heroY;
+      if (primeira) { x = alvoX; y = alvoY; primeira = false; }
+      luz.classList.add("ativo");
+      if (!rodando) { rodando = true; requestAnimationFrame(passo); }
+    });
+    hero.addEventListener("pointerleave", function () {
+      luz.classList.remove("ativo"); primeira = true;
+    });
+  }
+
   var ano = document.getElementById("ano");
   if (ano) ano.textContent = new Date().getFullYear();
 })();

@@ -375,36 +375,51 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 .hero-raios { position: absolute; inset: 0; --passo: 56px; }
 .raio {
   position: absolute; opacity: 0;
+  /* halo fixo (desenhado uma vez; a animação só move a camada) */
+  filter: drop-shadow(0 0 3px rgba(198, 241, 53, 0.55));
   animation: var(--dur, 10s) linear var(--atraso, 0s) infinite;
 }
 .raio-v {
   top: 0; width: 2px; height: 170px;
   left: calc(50% - var(--passo) / 2 - 0.5px + var(--c) * var(--passo));
   background: linear-gradient(to bottom,
-    rgba(198, 241, 53, 0) 0, rgba(198, 241, 53, 0.18) 45%,
-    rgba(198, 241, 53, 0.85) 97%, #f4ffd1 100%);
+    rgba(198, 241, 53, 0) 0, rgba(198, 241, 53, 0.35) 45%,
+    rgba(198, 241, 53, 1) 96%, #fbffe8 100%);
   animation-name: descer;
 }
 .raio-h {
   left: 0; height: 2px; width: 220px;
   top: calc(var(--m) * var(--passo) - 0.5px);
   background: linear-gradient(to right,
-    rgba(198, 241, 53, 0) 0, rgba(198, 241, 53, 0.18) 45%,
-    rgba(198, 241, 53, 0.85) 97%, #f4ffd1 100%);
+    rgba(198, 241, 53, 0) 0, rgba(198, 241, 53, 0.35) 45%,
+    rgba(198, 241, 53, 1) 96%, #fbffe8 100%);
   animation-name: atravessar;
 }
 @keyframes descer {
   0%   { transform: translateY(-170px); opacity: 0; }
-  12%  {                                opacity: 0.75; }
-  60%  {                                opacity: 0.6; }
+  12%  {                                opacity: 1; }
+  60%  {                                opacity: 0.9; }
   100% { transform: translateY(520px);  opacity: 0; }
 }
 @keyframes atravessar {
   0%   { transform: translateX(-220px); opacity: 0; }
-  15%  {                                opacity: 0.7; }
-  70%  {                                opacity: 0.55; }
+  15%  {                                opacity: 1; }
+  70%  {                                opacity: 0.85; }
   100% { transform: translateX(100vw);  opacity: 0; }
 }
+/* Luz do mouse: um brilho verde que segue o cursor com um leve atraso,
+   acendendo a grade por onde passa. Só se move com transform (sem repintar
+   nada). Só em telas com mouse. */
+.hero-mouse {
+  position: absolute; left: 0; top: 0; width: 520px; height: 520px;
+  margin: -260px 0 0 -260px; opacity: 0;
+  transition: opacity .5s ease;
+  will-change: transform;
+  background:
+    radial-gradient(closest-side, rgba(214, 248, 104, 0.16), rgba(198, 241, 53, 0.06) 45%, transparent 100%);
+}
+.hero-mouse.ativo { opacity: 1; }
+@media (hover: none), (pointer: coarse) { .hero-mouse { display: none; } }
 @media (prefers-reduced-motion: reduce) {
   .hero-brilho { animation: none; opacity: 0.85; }
   .fluxo, .raio { display: none; }
