@@ -23,7 +23,7 @@ window.DADOS = {
   // área (rótulo pequeno), número e o que ele significa.
   numeros: [
     { area: "Experiência", valor: "2 anos", texto: "com tráfego pago, sites, automações e processos comerciais" },
-    { area: "Tráfego pago", valor: "+118,8%", texto: "de melhora média nas campanhas de Meta Ads que eu assumi" },
+    { area: "Tráfego pago", valor: "+118,8%", texto: "de melhora média nas campanhas de Meta Ads que assumi" },
     { area: "Clientes", valor: "6", texto: "segmentos de negócio diferentes atendidos" },
     { area: "Sites", valor: "7 dias", texto: "no máximo para entregar um site depois de receber os materiais" },
   ],
