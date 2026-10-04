@@ -490,7 +490,7 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
   .hero-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 480px); gap: 72px; }
   /* Tamanho do texto no desktop (lado a lado com o card) */
   .hero .hero-copy h1 { font-size: clamp(2.3rem, 3.5vw, 3.3rem); }
-  .hero .hero-copy .lead { max-width: min(28rem, 32vw); font-size: 17px; margin-top: 18px; }
+  .hero .hero-copy .lead { max-width: min(30rem, 35vw); font-size: 17px; margin-top: 18px; }
   .hero .hero-copy .actions { margin-top: 28px; }
   /* texto centralizado na altura do card e um pouco mais para o meio */
   .hero-copy { align-self: center; margin-left: clamp(0px, (100vw - 1280px) / 4, 48px); }
@@ -511,7 +511,7 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
   .hero .funnel-panel { margin-right: -48px; }
 }
 .lead { margin-top: 22px; max-width: 34rem; font-size: 18px; line-height: 1.65; color: var(--text-2); }
-.hero .lead { color: #aebbd0; }
+.hero .lead { color: #aebbd0; text-wrap: pretty; }
 .actions { margin-top: 32px; display: flex; flex-wrap: wrap; gap: 12px; }
 @media (max-width: 480px) { .actions .btn { flex: 1 1 100%; } }
 /* Na hero os dois botões cabem lado a lado até ~350px */
