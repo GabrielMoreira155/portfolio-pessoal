@@ -491,9 +491,13 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
   /* Tamanho do texto no desktop (lado a lado com o card) */
   .hero .hero-copy h1 { font-size: clamp(2.3rem, 3.5vw, 3.3rem); }
   .hero .hero-copy .lead { max-width: min(30rem, 35vw); font-size: 17px; margin-top: 18px; }
-  .hero .hero-copy .actions { margin-top: 28px; }
-  /* texto alinhado ao topo do card (etiqueta na mesma altura da borda de cima) */
-  .hero-copy { align-self: start; margin-left: clamp(0px, (100vw - 1280px) / 4, 48px); }
+  /* texto ocupa a altura do card: etiqueta na borda de cima e botões
+     na base (o espaço que sobra fica entre o texto de apoio e os botões) */
+  .hero-copy {
+    align-self: stretch; display: flex; flex-direction: column; align-items: flex-start;
+    margin-left: clamp(0px, (100vw - 1280px) / 4, 48px);
+  }
+  .hero .hero-copy .actions { margin-top: auto; padding-top: 28px; }
 }
 /* A partir do tablet o card tem largura de sobra: descrição ao lado da barra
    (e não embaixo). O funil fica ~90px mais baixo e, no desktop, cabe inteiro
@@ -560,7 +564,7 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 .funnel-runner {
   position: absolute; left: 50%; top: 0; bottom: 0; width: 8px; margin-left: -4px;
   opacity: 0;
-  animation: run 4.8s var(--ease) 1.6s infinite;
+  animation: run 4.8s var(--ease) 2.2s infinite;
 }
 .funnel-runner::before {
   content: ""; position: absolute; left: 0; top: -4px; width: 8px; height: 8px;
@@ -586,11 +590,31 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
   color: var(--accent); font-weight: 600; font-size: 15px;
   transform-origin: left center;
   animation: grow .9s var(--ease) both;
-  animation-delay: calc(var(--i) * 140ms + 200ms);
+  animation-delay: calc(var(--i) * 140ms + 750ms);
 }
 .stage-site .bar { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
-.bar span { animation: fade .5s ease-out both; animation-delay: calc(var(--i) * 140ms + 650ms); }
+.bar span { animation: fade .5s ease-out both; animation-delay: calc(var(--i) * 140ms + 1200ms); }
 .bar svg { flex: none; }
+
+/* Entrada: ao abrir o site, as informações da hero aparecem uma depois da
+   outra (etiqueta, título, texto, botões, card e depois os números).
+   Só opacity e transform, uma vez só. */
+.hero-copy > *, .hero .funnel-panel, .stats .stat {
+  animation: entrar .8s var(--ease) both;
+}
+.hero-copy > :nth-child(1) { animation-delay: .05s; }
+.hero-copy > :nth-child(2) { animation-delay: .15s; }
+.hero-copy > :nth-child(3) { animation-delay: .3s; }
+.hero-copy > :nth-child(4) { animation-delay: .45s; }
+.hero .funnel-panel { animation-name: entrar-card; animation-duration: 1s; animation-delay: .35s; }
+.stats .stat:nth-child(1) { animation-delay: .7s; }
+.stats .stat:nth-child(2) { animation-delay: .8s; }
+.stats .stat:nth-child(3) { animation-delay: .9s; }
+@keyframes entrar { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes entrar-card { from { opacity: 0; transform: translateY(24px) scale(0.98); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .hero-copy > *, .hero .funnel-panel, .stats .stat { animation: none; }
+}
 
 /* Celular: funil mais baixo e menos denso, mesmo conteúdo */
 @media (max-width: 639px) {
