@@ -492,8 +492,8 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
   .hero .hero-copy h1 { font-size: clamp(2.3rem, 3.5vw, 3.3rem); }
   .hero .hero-copy .lead { max-width: min(30rem, 35vw); font-size: 17px; margin-top: 18px; }
   .hero .hero-copy .actions { margin-top: 28px; }
-  /* texto centralizado na altura do card e um pouco mais para o meio */
-  .hero-copy { align-self: center; margin-left: clamp(0px, (100vw - 1280px) / 4, 48px); }
+  /* texto alinhado ao topo do card (etiqueta na mesma altura da borda de cima) */
+  .hero-copy { align-self: start; margin-left: clamp(0px, (100vw - 1280px) / 4, 48px); }
 }
 /* A partir do tablet o card tem largura de sobra: descrição ao lado da barra
    (e não embaixo). O funil fica ~90px mais baixo e, no desktop, cabe inteiro
