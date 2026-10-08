@@ -595,7 +595,7 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 /* Entrada: ao abrir o site, as informações da hero aparecem uma depois da
    outra (etiqueta, título, texto, botões, card e depois os números).
    Só opacity e transform, uma vez só. */
-.hero-copy > *, .hero .funnel-panel, .stats .stat {
+.hero-copy > *, .hero .funnel-panel, .servicos-titulo, .servico {
   animation: entrar .8s var(--ease) both;
 }
 .hero-copy > :nth-child(1) { animation-delay: .05s; }
@@ -603,14 +603,15 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 .hero-copy > :nth-child(3) { animation-delay: .3s; }
 .hero-copy > :nth-child(4) { animation-delay: .45s; }
 .hero .funnel-panel { animation-name: entrar-card; animation-duration: 1s; animation-delay: .35s; }
-.stats .stat:nth-child(1) { animation-delay: .7s; }
-.stats .stat:nth-child(2) { animation-delay: .8s; }
-.stats .stat:nth-child(3) { animation-delay: .9s; }
-.stats .stat:nth-child(4) { animation-delay: 1s; }
+.servicos-titulo { animation-delay: .65s; }
+.servico:nth-child(1) { animation-delay: .75s; }
+.servico:nth-child(2) { animation-delay: .85s; }
+.servico:nth-child(3) { animation-delay: .95s; }
+.servico:nth-child(4) { animation-delay: 1.05s; }
 @keyframes entrar { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 @keyframes entrar-card { from { opacity: 0; transform: translateY(24px) scale(0.98); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) {
-  .hero-copy > *, .hero .funnel-panel, .stats .stat { animation: none; }
+  .hero-copy > *, .hero .funnel-panel, .servicos-titulo, .servico { animation: none; }
 }
 
 /* Celular: funil mais baixo e menos denso, mesmo conteúdo */
@@ -656,31 +657,29 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 
 /* ---------- Números ---------- */
 .stats { border-block: 1px solid var(--line); background: color-mix(in srgb, var(--surface) 55%, transparent); }
-.stats-grid { display: grid; grid-template-columns: 1fr; padding-inline: 0; }
-.stat { padding: 28px var(--pad); border-bottom: 1px solid var(--line); }
-.stat:last-child { border-bottom: 0; }
-.stat-pre {
-  display: block; margin-bottom: 14px; font-size: 12px; font-weight: 600;
-  letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3);
+/* Faixa "O que eu faço": título pequeno e os serviços em linha, separados
+   por divisórias (a partir de 1200px). Abaixo disso: 2 x 2. */
+.servicos-faixa { display: grid; gap: 14px; padding-block: 26px; }
+.servicos-titulo {
+  font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--text-3);
 }
-.stat-value {
-  display: block; font-family: var(--font-display); font-weight: 700;
-  font-size: clamp(1.9rem, 5vw, 2.9rem); line-height: 1; letter-spacing: -0.04em;
+.servicos { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 14px 16px; }
+.servico { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; color: var(--text); }
+.servico-icone {
+  flex: none; display: grid; place-items: center; width: 34px; height: 34px;
+  border-radius: 10px; color: var(--accent);
+  background: var(--accent-soft); border: 1px solid var(--accent-soft-2);
 }
-/* o número de resultado (tráfego) fica em destaque */
-.stat:nth-child(2) .stat-value { color: var(--accent); }
-.stat-text { margin-top: 10px; font-size: 14px; line-height: 1.45; color: var(--text-2); max-width: 19rem; }
-/* tablet: 2 x 2 */
-@media (min-width: 640px) and (max-width: 1023px) {
-  .stats-grid { grid-template-columns: 1fr 1fr; }
-  .stat:nth-child(odd) { border-right: 1px solid var(--line); }
-  .stat:nth-last-child(-n+2) { border-bottom: 0; }
+@media (max-width: 380px) { .servico { font-size: 14px; } .servico-icone { width: 30px; height: 30px; } }
+@media (min-width: 640px) and (max-width: 1199px) {
+  .servicos { gap: 16px 32px; }
 }
-@media (min-width: 1024px) {
-  .stats-grid { grid-template-columns: repeat(4, 1fr); padding-inline: var(--pad); }
-  .stat { padding: 40px 28px; border-bottom: 0; border-right: 1px solid var(--line); }
-  .stat:first-child { padding-left: 0; }
-  .stat:last-child { border-right: 0; }
+@media (min-width: 1200px) {
+  .servicos-faixa { grid-template-columns: auto 1fr; align-items: center; gap: 40px; padding-block: 30px; }
+  .servicos { grid-template-columns: repeat(4, auto); justify-content: space-between; gap: 0; }
+  .servico { padding-inline: 28px; border-left: 1px solid var(--line); font-size: 16px; white-space: nowrap; }
+  .servico:last-child { padding-right: 0; }
 }
 
 /* ---------- Seções ---------- */

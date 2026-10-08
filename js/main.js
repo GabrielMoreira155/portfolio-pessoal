@@ -55,16 +55,22 @@
     }
   });
 
-  // Números
-  var numeros = document.getElementById("numeros");
-  if (numeros && D.numeros) {
-    numeros.innerHTML = D.numeros.map(function (n) {
+  // O que eu faço (faixa abaixo do hero)
+  var icones = {
+    anuncio: '<path d="M4 10v4a1 1 0 0 0 1 1h2l5 4V5L7 9H5a1 1 0 0 0-1 1Z"/><path d="M16 9a4 4 0 0 1 0 6M19 6a8 8 0 0 1 0 12"/>',
+    site: '<rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18M7 6.5h.01M10 6.5h.01"/>',
+    automacao: '<path d="M13 3 5 13.5h6L10 21l8-10.5h-6L13 3Z"/>',
+    comercial: '<path d="M4 19V9M10 19V5M16 19v-7M21 19H3"/>'
+  };
+  var servicos = document.getElementById("servicos");
+  if (servicos && D.servicos) {
+    servicos.innerHTML = D.servicos.map(function (s) {
       return (
-        '<div class="stat">' +
-          '<span class="stat-pre">' + txt(n.area || n.prefixo || "") + "</span>" +
-          '<strong class="stat-value">' + txt(n.valor) + "</strong>" +
-          '<p class="stat-text">' + txt(n.texto) + "</p>" +
-        "</div>"
+        '<li class="servico">' +
+          '<span class="servico-icone"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+            (icones[s.icone] || icones.site) + "</svg></span>" +
+          "<span>" + txt(s.nome) + "</span>" +
+        "</li>"
       );
     }).join("");
   }
