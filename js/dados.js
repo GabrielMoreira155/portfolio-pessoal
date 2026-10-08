@@ -29,6 +29,8 @@ window.DADOS = {
   ],
 
   // Cases de tráfego. Formato: Situação / O que eu fiz / Resultado
+  // (seção tirada do site por enquanto; os dados ficam guardados aqui para
+  // quando ela voltar)
   cases: [
     {
       segmento: "Imobiliária",
@@ -56,7 +58,7 @@ window.DADOS = {
     },
   ],
 
-  // Linha "Também atendi" abaixo dos cases
+  // Linha "Também atendi" abaixo dos cases (fora do site junto com eles)
   outrosSegmentos: [
     "Farmácia",
     "Clínica de estética",
