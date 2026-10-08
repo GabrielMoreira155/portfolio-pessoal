@@ -658,7 +658,7 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 /* ---------- Números ---------- */
 .stats { border-block: 1px solid var(--line); background: color-mix(in srgb, var(--surface) 55%, transparent); }
 /* Faixa "O que eu faço": título pequeno e os serviços em linha, separados
-   por divisórias (a partir de 1200px). Abaixo disso: 2 x 2. */
+   por divisórias. Celular e tablet: 2 x 2. */
 .servicos-faixa { display: grid; gap: 14px; padding-block: 26px; }
 .servicos-titulo {
   font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
@@ -672,14 +672,22 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
   background: var(--accent-soft); border: 1px solid var(--accent-soft-2);
 }
 @media (max-width: 380px) { .servico { font-size: 14px; } .servico-icone { width: 30px; height: 30px; } }
-@media (min-width: 640px) and (max-width: 1199px) {
+@media (min-width: 640px) and (max-width: 1023px) {
   .servicos { gap: 16px 32px; }
 }
-@media (min-width: 1200px) {
-  .servicos-faixa { grid-template-columns: auto 1fr; align-items: center; gap: 40px; padding-block: 30px; }
+/* notebook: título em cima e os 4 serviços numa linha */
+@media (min-width: 1024px) {
   .servicos { grid-template-columns: repeat(4, auto); justify-content: space-between; gap: 0; }
-  .servico { padding-inline: 28px; border-left: 1px solid var(--line); font-size: 16px; white-space: nowrap; }
+  .servico { padding-inline: 24px; border-left: 1px solid var(--line); white-space: nowrap; }
+  .servico:first-child { padding-left: 0; border-left: 0; }
   .servico:last-child { padding-right: 0; }
+}
+/* telas largas: título e serviços na mesma linha */
+@media (min-width: 1440px) {
+  .servicos-faixa { grid-template-columns: auto 1fr; align-items: center; gap: 40px; padding-block: 30px; }
+  .servicos-titulo { white-space: nowrap; }
+  .servico { padding-inline: 28px; font-size: 16px; }
+  .servico:first-child { padding-left: 28px; border-left: 1px solid var(--line); }
 }
 
 /* ---------- Seções ---------- */

@@ -25,7 +25,7 @@ window.DADOS = {
     { nome: "Meta Ads e Google Ads", icone: "anuncio" },
     { nome: "Sites e landing pages", icone: "site" },
     { nome: "Automações", icone: "automacao" },
-    { nome: "Processos comerciais", icone: "comercial" },
+    { nome: "Estruturação de Processos Comerciais", icone: "comercial" },
   ],
 
   // Cases de tráfego. Formato: Situação / O que eu fiz / Resultado
