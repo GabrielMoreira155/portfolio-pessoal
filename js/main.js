@@ -175,6 +175,30 @@
     listaC.innerHTML = D.projetos.filter(function (p) { return !p.imagem; }).map(cardProjeto).join("");
   }
 
+  // Projetos aparecem ao rolar: título e cards sobem em sequência e a tela
+  // de cada notebook "abre". Só transform e opacity, uma vez por elemento.
+  var revelaveis = document.querySelectorAll("#projetos .section-head > *, #projetos .project");
+  var semMovimento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if ("IntersectionObserver" in window && !semMovimento && revelaveis.length) {
+    document.documentElement.classList.add("js-revelar");
+    revelaveis.forEach(function (el, i) {
+      el.classList.add("revelar");
+      // atraso em cascata dentro de cada linha de 3 cards
+      el.style.setProperty("--atraso-revelar", (el.classList.contains("project") ? (i % 3) * 120 : i * 100) + "ms");
+    });
+    var obs = new IntersectionObserver(function (itens) {
+      itens.forEach(function (it) {
+        if (!it.isIntersecting) return;
+        var el = it.target;
+        el.classList.add("visivel");
+        obs.unobserve(el);
+        // depois de aparecer, tira o atraso para o hover responder na hora
+        setTimeout(function () { el.style.setProperty("--atraso-revelar", "0ms"); }, 1700);
+      });
+    }, { rootMargin: "0px 0px -12% 0px", threshold: 0.12 });
+    revelaveis.forEach(function (el) { obs.observe(el); });
+  }
+
   // Menu mobile
   var toggle = document.querySelector(".menu-toggle");
   var menu = document.getElementById("menu");

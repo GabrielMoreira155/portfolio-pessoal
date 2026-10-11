@@ -796,6 +796,33 @@ a.project-link:hover svg { transform: translate(2px, -2px); }
 .project-link.disabled { color: var(--text-3); font-weight: 500; }
 .project-body .project-link { margin-top: auto; }
 .project-result { margin-top: 14px; font-size: 14px; font-weight: 500; color: var(--text-3); }
+/* Animações dos projetos
+   1. ao rolar: título e cards sobem em cascata (classe ligada pelo main.js)
+   2. a tela do notebook abre (gira a partir da base) logo depois do card
+   3. no hover: o card sobe um pouco e o print aproxima devagar
+   Só transform e opacity. */
+.js-revelar .revelar {
+  opacity: 0; transform: translateY(28px);
+  transition: opacity .8s var(--ease), transform .8s var(--ease);
+  transition-delay: var(--atraso-revelar, 0ms);
+}
+.js-revelar .revelar.visivel { opacity: 1; transform: none; }
+.js-revelar .revelar .notebook { perspective: 1200px; }
+.js-revelar .revelar .notebook-tela {
+  transform: rotateX(-78deg); transform-origin: 50% 100%; opacity: 0.4;
+  transition: transform 1s cubic-bezier(0.2, 0.8, 0.2, 1), opacity .6s ease;
+  transition-delay: calc(var(--atraso-revelar, 0ms) + 250ms);
+}
+.js-revelar .revelar.visivel .notebook-tela { transform: none; opacity: 1; }
+.project { transition: transform .4s var(--ease), border-color .4s var(--ease); }
+.project .notebook-tela img { transition: transform .8s var(--ease); }
+@media (hover: hover) {
+  .js-revelar .project.revelar.visivel:hover, .project:hover { transform: translateY(-6px); border-color: var(--line-2); }
+  .project:hover .notebook-tela img { transform: scale(1.05); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .project, .project .notebook-tela img { transition: none; }
+}
 /* print do site dentro de um notebook: tela com moldura escura e base */
 .notebook { padding: 22px 26px 0; }
 .notebook-tela {
