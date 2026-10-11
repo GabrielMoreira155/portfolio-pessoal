@@ -175,9 +175,32 @@
     listaC.innerHTML = D.projetos.filter(function (p) { return !p.imagem; }).map(cardProjeto).join("");
   }
 
+  // Além do site: um card por empresa com o que mais foi feito
+  var listaA = document.getElementById("lista-alem");
+  if (listaA && D.alemDoSite) {
+    listaA.innerHTML = D.alemDoSite.map(function (c) {
+      return (
+        '<article class="card alem-card">' +
+          '<div class="alem-topo"><h3>' + txt(c.nome) + "</h3>" +
+            (c.segmento ? '<span class="tag tag-plain">' + txt(c.segmento) + "</span>" : "") +
+          "</div>" +
+          '<ul class="alem-feitos">' +
+            (c.feitos || []).map(function (f) {
+              return '<li><span class="servico-icone"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+                (icones[f.icone] || icones.automacao) + "</svg></span><span>" + txt(f.texto) + "</span></li>";
+            }).join("") +
+          "</ul>" +
+          (c.comprovante
+            ? '<figure class="alem-comprovante"><img src="' + attr(c.comprovante) + '" alt="Resultado: ' + attr(c.nome) + '" loading="lazy" decoding="async"><figcaption>Resultado</figcaption></figure>'
+            : "") +
+        "</article>"
+      );
+    }).join("");
+  }
+
   // Projetos aparecem ao rolar: título e cards sobem em sequência e a tela
   // de cada notebook "abre". Só transform e opacity, uma vez por elemento.
-  var revelaveis = document.querySelectorAll("#projetos .section-head > *, #projetos .project");
+  var revelaveis = document.querySelectorAll("#projetos .section-head > *, #projetos .project, #alem-do-site .section-head > *, #alem-do-site .alem-card");
   var semMovimento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if ("IntersectionObserver" in window && !semMovimento && revelaveis.length) {
     document.documentElement.classList.add("js-revelar");

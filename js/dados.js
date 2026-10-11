@@ -131,4 +131,46 @@ window.DADOS = {
       imagem: "imagens/projetos/virtus-doctor.webp",
     },
   ],
+
+  /*
+    Além do site (seção 02): o que mais foi feito em cada empresa.
+    feitos: lista do que foi feito. icone: anuncio, automacao, comercial ou site
+    comprovante: print de resultado em imagens/resultados/ (deixe "" enquanto
+                 não tiver; o espaço só aparece quando houver imagem)
+  */
+  alemDoSite: [
+    {
+      nome: "Residencial Morada dos Sonhos",
+      segmento: "Imóveis",
+      feitos: [
+        { icone: "automacao", texto: "Automação do chatbot" },
+        { icone: "anuncio", texto: "Campanhas no Meta Ads" },
+      ],
+      comprovante: "",
+    },
+    {
+      nome: "Neuropsicóloga",
+      segmento: "Saúde",
+      feitos: [{ icone: "automacao", texto: "Automação" }],
+      comprovante: "",
+    },
+    {
+      nome: "Fondly Sublimados",
+      segmento: "Produtos personalizados",
+      feitos: [{ icone: "automacao", texto: "Automação" }],
+      comprovante: "",
+    },
+    {
+      nome: "Drogaria Cruzeiro",
+      segmento: "Farmácia",
+      feitos: [{ icone: "comercial", texto: "Estruturação de processo comercial" }],
+      comprovante: "",
+    },
+    {
+      nome: "Agência de Marketing Digital para médicos",
+      segmento: "Marketing médico",
+      feitos: [{ icone: "anuncio", texto: "Estruturação de campanhas no Google Ads" }],
+      comprovante: "",
+    },
+  ],
 };

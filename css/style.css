@@ -909,6 +909,19 @@ a.project-link:hover svg { transform: translate(2px, -2px); }
 .project-compacto .project-tags { margin-top: 12px; }
 .project-tags + .project-link { margin-top: 20px; }
 
+/* ---------- Além do site ---------- */
+.alem { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); }
+.alem-card { padding: 26px; display: flex; flex-direction: column; gap: 20px; }
+.alem-topo { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.alem-card h3 { font-size: 21px; line-height: 1.2; }
+.alem-feitos { list-style: none; display: grid; gap: 12px; padding-top: 18px; border-top: 1px solid var(--line); }
+.alem-feitos li { display: flex; align-items: center; gap: 12px; font-size: 15px; font-weight: 600; color: var(--text); }
+.alem-comprovante { margin: auto 0 0; }
+.alem-comprovante img { width: 100%; border-radius: var(--radius-md); border: 1px solid var(--line); }
+.alem-comprovante figcaption { margin-top: 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3); }
+.alem-card { transition: transform .4s var(--ease), border-color .4s var(--ease); }
+@media (hover: hover) { .alem-card:hover { transform: translateY(-6px); border-color: var(--line-2); } }
+
 /* ---------- Como trabalho ---------- */
 .steps { list-style: none; display: grid; gap: 16px; }
 @media (min-width: 700px) { .steps { grid-template-columns: 1fr 1fr; } }
