@@ -208,12 +208,20 @@
       toggle.setAttribute("aria-expanded", open ? "true" : "false");
       toggle.setAttribute("aria-label", open ? "Fechar menu" : "Abrir menu");
     });
+    var fecharMenu = function () {
+      menu.classList.remove("open");
+      toggle.setAttribute("aria-expanded", "false");
+      toggle.setAttribute("aria-label", "Abrir menu");
+    };
     menu.addEventListener("click", function (e) {
-      if (e.target.tagName === "A") {
-        menu.classList.remove("open");
-        toggle.setAttribute("aria-expanded", "false");
-        toggle.setAttribute("aria-label", "Abrir menu");
-      }
+      if (e.target.tagName === "A") fecharMenu();
+    });
+    // fecha com Esc (e devolve o foco ao botão) e ao tocar fora do menu
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && menu.classList.contains("open")) { fecharMenu(); toggle.focus(); }
+    });
+    document.addEventListener("click", function (e) {
+      if (menu.classList.contains("open") && !menu.contains(e.target) && !toggle.contains(e.target)) fecharMenu();
     });
   }
 

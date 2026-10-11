@@ -82,6 +82,7 @@ body {
   overflow-x: hidden;
 }
 ::selection { background: var(--accent-soft-2); }
+a, button { -webkit-tap-highlight-color: transparent; }
 img { max-width: 100%; display: block; }
 a { color: inherit; }
 h1, h2, h3 { font-family: var(--font-display); font-weight: 600; margin: 0; letter-spacing: -0.03em; text-wrap: balance; }
@@ -191,17 +192,20 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
   transition: background-color .3s ease-out, border-color .3s ease-out, transform .3s ease-out, color .3s ease-out, box-shadow .3s ease-out;
 }
 .btn-sm { height: 38px; padding: 0 16px; font-size: 14px; }
+@media (pointer: coarse) { .btn-sm { height: 44px; } }
 .btn-lg { height: 54px; padding: 0 26px; font-size: 16px; }
 .btn-primary {
   background: var(--accent); color: var(--accent-ink);
   box-shadow: 0 0 0 1px rgba(255,255,255,.12) inset, 0 14px 34px -14px var(--accent-line);
 }
-.btn-primary:hover { background: var(--accent-hover); transform: scale(1.03); box-shadow: 0 0 0 1px rgba(255,255,255,.18) inset, 0 20px 44px -14px var(--accent-line); }
+.btn-primary:hover { background: var(--accent-hover); box-shadow: 0 0 0 1px rgba(255,255,255,.18) inset, 0 20px 44px -14px var(--accent-line); }
+@media (hover: hover) { .btn-primary:hover { transform: scale(1.03); } }
 .btn-primary .arrow { transition: transform .3s ease-out; }
 .btn-primary:hover .arrow { transform: translateX(2px); }
 .btn-ghost { background: var(--surface); color: var(--text); border-color: var(--line-2); }
-.btn-ghost:hover { transform: scale(1.02); border-color: var(--text-3); background: var(--surface-2); }
-.btn:active { transform: scale(0.98); }
+.btn-ghost:hover { border-color: var(--text-3); background: var(--surface-2); }
+@media (hover: hover) { .btn-ghost:hover { transform: scale(1.02); } }
+.btn:active { transform: scale(0.97); transition-duration: .1s; }
 /* Na hero escura, o botão secundário é de vidro, como no Pulsedesk */
 /* Sem backdrop-filter sobre a animação: desfocar um fundo animado a cada
    quadro é caro. Fundo escuro quase opaco no lugar do vidro. */
@@ -280,6 +284,8 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 .nav { display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 16px; }
 .brand { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 700; font-size: 18px; letter-spacing: -0.03em; text-decoration: none; }
 .brand-nome { white-space: nowrap; }
+/* área de toque do logo: 44px de altura sem mudar o visual */
+.brand { min-height: 44px; min-width: 44px; }
 /* celular estreito: só o monograma no topo (o nome aparece na hero) */
 @media (max-width: 419px) { .brand-nome { display: none; } }
 /* monograma GM (o mesmo desenho do favicon) */
@@ -852,6 +858,7 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 .project-link svg { transition: transform .25s var(--ease); }
 a.project-link:hover svg { transform: translate(2px, -2px); }
 .project-link.disabled { color: var(--text-3); font-weight: 500; }
+a.project-link { min-height: 44px; }
 .project-body .project-link { margin-top: auto; }
 .project-result { margin-top: 14px; font-size: 14px; font-weight: 500; color: var(--text-3); }
 /* Animações dos projetos
