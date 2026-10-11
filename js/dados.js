@@ -122,7 +122,7 @@ window.DADOS = {
       tipo: "Site",
       link: "https://drogariacruzeiro.site/",
       nota: "Em parceria com a Virtus Apex",
-      imagem: "imagens/projetos/drogaria-cruzeiro.webp",
+      imagem: "imagens/projetos/drogaria-cruzeiro.webp?v=4",
     },
     {
       nome: "Agencia de Marketing Digital para médicos",
