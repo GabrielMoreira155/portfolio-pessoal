@@ -101,6 +101,65 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
+/* Fundo animado do site todo: igual ao da hero (grade de 56px, pulsos nas
+   linhas e brilho do mouse), fixo na tela e atrás de tudo. Camadas separadas:
+   a grade com máscara fica parada; os pulsos e o brilho só mexem com
+   transform e opacity (rodam no compositor, sem repintar). */
+.site-fundo { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; --passo: 56px; }
+.site-grade {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: var(--passo) var(--passo);
+  background-position: center top;
+  -webkit-mask-image: radial-gradient(85% 80% at 50% 45%, #000 0%, rgba(0, 0, 0, 0.45) 60%, transparent 100%);
+  mask-image: radial-gradient(85% 80% at 50% 45%, #000 0%, rgba(0, 0, 0, 0.45) 60%, transparent 100%);
+}
+.site-raios { position: absolute; inset: 0; }
+.raio-site {
+  position: absolute; opacity: 0;
+  filter: drop-shadow(0 0 3px rgba(198, 241, 53, 0.2));
+  animation: var(--dur, 16s) linear var(--atraso, 0s) infinite;
+}
+.raio-site-v {
+  top: 0; width: 2px; height: 170px;
+  left: calc(50% - var(--passo) / 2 - 0.5px + var(--c) * var(--passo));
+  background: linear-gradient(to bottom,
+    rgba(198, 241, 53, 0) 0, rgba(198, 241, 53, 0.12) 45%,
+    rgba(198, 241, 53, 0.4) 96%, rgba(251, 255, 232, 0.5) 100%);
+  animation-name: descer-tela;
+}
+.raio-site-h {
+  left: 0; height: 2px; width: 220px;
+  top: calc(var(--m) * var(--passo) - 0.5px);
+  background: linear-gradient(to right,
+    rgba(198, 241, 53, 0) 0, rgba(198, 241, 53, 0.12) 45%,
+    rgba(198, 241, 53, 0.4) 96%, rgba(251, 255, 232, 0.5) 100%);
+  animation-name: atravessar;
+}
+@keyframes descer-tela {
+  0%   { transform: translateY(-170px);                opacity: 0; }
+  10%  {                                               opacity: 1; }
+  70%  {                                               opacity: 0.85; }
+  100% { transform: translateY(calc(100vh + 20px));    opacity: 0; }
+}
+/* brilho amarelado que segue o cursor pelo site todo (o mesmo da hero) */
+.site-mouse {
+  position: absolute; left: 0; top: 0; width: 520px; height: 520px;
+  margin: -260px 0 0 -260px; opacity: 0;
+  transition: opacity .5s ease;
+  will-change: transform;
+  background: radial-gradient(closest-side, rgba(214, 248, 104, 0.06), rgba(198, 241, 53, 0.025) 45%, transparent 100%);
+}
+.site-mouse.ativo { opacity: 1; }
+@media (max-width: 1199px) {
+  .site-fundo { --passo: 44px; }
+  .raio-site-h { display: none; }
+}
+@media (hover: none), (pointer: coarse) { .site-mouse { display: none; } }
+@media (prefers-reduced-motion: reduce) { .raio-site { display: none; } }
+
 /* Moldura com bordas laterais e linhas-guia de 4 colunas */
 /* As seções ocupam a largura toda da tela (sem faixas nas laterais);
    o conteúdo continua centralizado pelo .wrap */
@@ -197,8 +256,7 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 /* ---------- Header ---------- */
 .header {
   position: sticky; top: 0; z-index: 50;
-  background: color-mix(in srgb, var(--bg) 78%, transparent);
-  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  background: color-mix(in srgb, var(--bg) 94%, transparent);
   border-bottom: 1px solid var(--line);
   transition: background-color .3s ease-out, border-color .3s ease-out;
 }

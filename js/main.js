@@ -263,6 +263,31 @@
     });
   }
 
+  // Brilho que segue o mouse no site todo (camada fixa atrás das seções).
+  // Usa a posição na tela (clientX/Y): nada para medir a cada movimento.
+  var luzSite = document.querySelector(".site-mouse");
+  if (luzSite && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    var sAlvoX = 0, sAlvoY = 0, sx = 0, sy = 0, sRodando = false, sPrimeira = true;
+    var sSuave = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var sPasso = function () {
+      var k = sSuave ? 0.16 : 1;
+      sx += (sAlvoX - sx) * k; sy += (sAlvoY - sy) * k;
+      if (Math.abs(sAlvoX - sx) < 0.3 && Math.abs(sAlvoY - sy) < 0.3) { sx = sAlvoX; sy = sAlvoY; sRodando = false; }
+      luzSite.style.transform = "translate3d(" + sx + "px," + sy + "px,0)";
+      if (sRodando) requestAnimationFrame(sPasso);
+    };
+    window.addEventListener("pointermove", function (e) {
+      if (e.pointerType && e.pointerType !== "mouse") return;
+      sAlvoX = e.clientX; sAlvoY = e.clientY;
+      if (sPrimeira) { sx = sAlvoX; sy = sAlvoY; sPrimeira = false; }
+      luzSite.classList.add("ativo");
+      if (!sRodando) { sRodando = true; requestAnimationFrame(sPasso); }
+    }, { passive: true });
+    document.documentElement.addEventListener("mouseleave", function () {
+      luzSite.classList.remove("ativo"); sPrimeira = true;
+    });
+  }
+
   var ano = document.getElementById("ano");
   if (ano) ano.textContent = new Date().getFullYear();
 })();

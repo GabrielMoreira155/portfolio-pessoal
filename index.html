@@ -30,13 +30,21 @@
      chegarem, faziam o navegador refazer o layout: ~85 a 220 ms de travada) -->
 <link rel="preload" href="fontes/bricolage-grotesque-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fontes/public-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="css/style.css?v=20261011">
+<link rel="stylesheet" href="css/style.css?v=20261011b">
 
 
 </head>
 <body>
 
 <div class="page-bg" aria-hidden="true"></div>
+<!-- Fundo do site todo (atrás das seções): a mesma grade da hero, pulsos de
+     luz correndo pelas linhas e o brilho que segue o mouse. Fica fixo na tela;
+     a hero tem o fundo próprio por cima. -->
+<div class="site-fundo" aria-hidden="true">
+  <div class="site-grade"></div>
+  <div class="site-raios"><span class="raio-site raio-site-v" style="--c:-11;--dur:17s;--atraso:-3s"></span><span class="raio-site raio-site-v" style="--c:-6;--dur:21s;--atraso:-12s"></span><span class="raio-site raio-site-v" style="--c:-2;--dur:15s;--atraso:-7s"></span><span class="raio-site raio-site-v" style="--c:4;--dur:19s;--atraso:-15s"></span><span class="raio-site raio-site-v" style="--c:9;--dur:16s;--atraso:-1s"></span><span class="raio-site raio-site-v" style="--c:13;--dur:22s;--atraso:-9s"></span><span class="raio-site raio-site-h" style="--m:3;--dur:18s;--atraso:-5s"></span><span class="raio-site raio-site-h" style="--m:11;--dur:23s;--atraso:-14s"></span></div>
+  <div class="site-mouse"></div>
+</div>
 
 <div class="frame">
   <div class="guides" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
@@ -274,7 +282,7 @@
   </footer>
 </div>
 
-<script src="js/dados.js?v=20261011"></script>
-<script src="js/main.js?v=20261011"></script>
+<script src="js/dados.js?v=20261011b"></script>
+<script src="js/main.js?v=20261011b"></script>
 </body>
 </html>
