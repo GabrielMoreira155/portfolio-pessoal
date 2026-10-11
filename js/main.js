@@ -1,6 +1,6 @@
 /*
   Monta as partes dinâmicas do site a partir de js/dados.js.
-  Não precisa mexer aqui para adicionar cases ou projetos.
+  Não precisa mexer aqui para adicionar números ou projetos.
 */
 (function () {
   var D = window.DADOS || {};
@@ -39,21 +39,49 @@
 
   var ig = String(contato.instagram || "").replace(/^@/, "");
   document.querySelectorAll("[data-instagram]").forEach(function (a) {
-    a.href = isPlaceholder(ig) ? "#contato" : "https://instagram.com/" + encodeURIComponent(ig);
+    if (isPlaceholder(ig) || !ig) {
+      a.href = "#contato";
+    } else {
+      a.href = "https://instagram.com/" + encodeURIComponent(ig);
+      a.target = "_blank";
+      a.rel = "noopener";
+    }
   });
   document.querySelectorAll("[data-instagram-handle]").forEach(function (el) {
     el.innerHTML = txt("@" + ig);
   });
 
-  document.querySelectorAll("[data-virtus]").forEach(function (a) {
-    if (isPlaceholder(contato.virtusApex)) {
-      a.href = "#sobre";
-      a.removeAttribute("target");
-      a.innerHTML = "Conhecer a Virtus Apex " + txt("[link]");
+  // Links da Virtus Apex. Enquanto o link não estiver em dados.js, o botão
+  // leva para a seção de contato (nunca para "#").
+  function linkExterno(a, url) {
+    if (url) {
+      a.href = url;
+      a.target = "_blank";
+      a.rel = "noopener";
     } else {
-      a.href = contato.virtusApex;
+      a.href = "#contato";
+      a.removeAttribute("target");
     }
+  }
+  var vSite = isPlaceholder(contato.virtusSite) ? "" : contato.virtusSite;
+  var vIg = String(contato.virtusInstagram || "").replace(/^@/, "");
+  document.querySelectorAll("[data-virtus-site]").forEach(function (a) { linkExterno(a, vSite); });
+  document.querySelectorAll("[data-virtus-instagram]").forEach(function (a) {
+    linkExterno(a, isPlaceholder(vIg) || !vIg ? "" : "https://instagram.com/" + encodeURIComponent(vIg));
   });
+
+  // Números em destaque (faixa abaixo do hero)
+  var numeros = document.getElementById("numeros");
+  if (numeros && D.numeros) {
+    numeros.innerHTML = D.numeros.map(function (n) {
+      return (
+        '<div class="stat">' +
+          '<strong class="stat-value">' + txt(n.valor) + "</strong>" +
+          '<p class="stat-text">' + txt(n.texto) + "</p>" +
+        "</div>"
+      );
+    }).join("");
+  }
 
   // O que eu faço (faixa abaixo do hero)
   var icones = {
@@ -108,41 +136,40 @@
     }).join("");
   }
 
-  // Projetos
-  var statusNome = {
-    "no-ar": "No ar",
-    "em-desenvolvimento": "Em desenvolvimento",
-    "concluido": "Concluído",
-  };
+  // Projetos: com print (sites) na primeira grade; sem print (tráfego e
+  // outros) numa grade de cards compactos logo abaixo.
   var seta =
     '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>';
 
-  var projetos = document.getElementById("lista-projetos");
-  if (projetos && D.projetos) {
-    projetos.innerHTML = D.projetos.map(function (p) {
-      var status = statusNome[p.status] ? p.status : "em-desenvolvimento";
-      var link = p.link && !isPlaceholder(p.link)
-        ? '<a class="project-link" href="' + attr(p.link) + '" target="_blank" rel="noopener">Ver projeto' + seta + "</a>"
-        : '<span class="project-link disabled">Link em breve</span>';
-      return (
-        '<article class="card project">' +
-          '<div class="project-shot">' +
-            '<img src="' + attr(p.imagem) + '" alt="Print do projeto ' + attr(p.titulo) + '" loading="lazy" decoding="async" width="1200" height="750">' +
-          "</div>" +
-          '<div class="project-body">' +
-            '<div class="project-head">' +
-              "<h3>" + txt(p.titulo) + "</h3>" +
-              '<span class="status status-' + status + '">' + statusNome[status] + "</span>" +
-            "</div>" +
-            '<p class="project-desc">' + txt(p.descricao) + "</p>" +
-            '<ul class="project-tags">' +
-              (p.tags || []).map(function (t) { return '<li class="tag tag-plain">' + txt(t) + "</li>"; }).join("") +
-            "</ul>" +
-            link +
-          "</div>" +
-        "</article>"
-      );
+  function cardProjeto(p) {
+    var link = p.link && !isPlaceholder(p.link)
+      ? '<a class="project-link" href="' + attr(p.link) + '" target="_blank" rel="noopener">' +
+          txt(p.link.replace(/^https?:\/\//, "").replace(/\/$/, "")) + seta + "</a>"
+      : (p.link ? '<span class="project-link disabled">Link ' + txt(p.link) + "</span>" : "");
+    var tags = [p.segmento, p.tipo].filter(Boolean).map(function (t) {
+      return '<li class="tag tag-plain">' + txt(t) + "</li>";
     }).join("");
+    return (
+      '<article class="card project' + (p.imagem ? "" : " project-compacto") + '">' +
+        (p.imagem
+          ? '<div class="project-shot"><img src="' + attr(p.imagem) + '" alt="Print do site ' + attr(p.nome) + '" loading="lazy" decoding="async" width="1200" height="750"></div>'
+          : "") +
+        '<div class="project-body">' +
+          "<h3>" + txt(p.nome) + "</h3>" +
+          '<ul class="project-tags">' + tags + "</ul>" +
+          (p.resultado ? '<p class="project-result">' + txt(p.resultado) + "</p>" : "") +
+          link +
+        "</div>" +
+      "</article>"
+    );
+  }
+  var listaP = document.getElementById("lista-projetos");
+  var listaC = document.getElementById("lista-projetos-compactos");
+  if (listaP && D.projetos) {
+    listaP.innerHTML = D.projetos.filter(function (p) { return p.imagem; }).map(cardProjeto).join("");
+  }
+  if (listaC && D.projetos) {
+    listaC.innerHTML = D.projetos.filter(function (p) { return !p.imagem; }).map(cardProjeto).join("");
   }
 
   // Menu mobile

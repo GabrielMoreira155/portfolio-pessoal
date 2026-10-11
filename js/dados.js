@@ -1,7 +1,7 @@
 /*
   DADOS DO SITE
   Este é o único arquivo que você precisa editar para atualizar
-  contatos, números, cases e projetos. O layout se monta sozinho.
+  contatos, números, serviços e projetos. O layout se monta sozinho.
 
   Dica: qualquer texto entre [colchetes] aparece destacado em amarelo
   no site, para você lembrar que ainda é um placeholder.
@@ -15,11 +15,19 @@ window.DADOS = {
       "Oi, Gabriel! Vi seu site e quero entender onde meus clientes estão se perdendo.",
     // Sem o @. Ex.: "gabrielmoreira"
     instagram: "[seuperfil]",
-    // Site ou Instagram da Virtus Apex
-    virtusApex: "[link da Virtus Apex]",
+    // Virtus Apex: endereço completo do site e @ do Instagram (sem o @)
+    virtusSite: "[link do site da Virtus Apex]",
+    virtusInstagram: "[perfil da Virtus Apex]",
   },
 
-  // Faixa logo abaixo do hero: o que eu faço (sem números; os resultados
+  // Números em destaque, logo abaixo do hero
+  numeros: [
+    { valor: "6", texto: "segmentos atendidos" },
+    { valor: "+118,8%", texto: "nos resultados de uma campanha no Meta Ads" },
+    { valor: "2 anos", texto: "trabalhando com tráfego pago" },
+  ],
+
+  // Faixa "O que eu faço", logo abaixo dos números (sem números; os resultados
   // ficam nos cases). Ícones disponíveis: anuncio, site, automacao, comercial.
   servicos: [
     { nome: "Meta Ads e Google Ads", icone: "anuncio" },
@@ -68,35 +76,58 @@ window.DADOS = {
   ],
 
   /*
-    Projetos de desenvolvimento
-    imagem: caminho do print dentro de imagens/projetos/ (ideal: .webp, 1200x750)
-    status: "no-ar", "em-desenvolvimento" ou "concluido"
-    link: deixe "" se ainda não tiver link público
+    Projetos (seção 01 · O que eu já construí)
+    nome, segmento, tipo: textos do card
+    link: endereço completo; deixe entre [colchetes] enquanto não tiver
+    resultado: resultado ou status (o que aparecer aqui fica em destaque)
+    imagem: print do site em imagens/projetos/ (ideal: .webp, 1200x750).
+            Sem imagem, o card fica compacto (bom para tráfego pago).
   */
   projetos: [
     {
-      titulo: "[Nome do projeto 1]",
-      descricao: "[Descrição curta: o que é, para quem e qual problema resolve.]",
-      imagem: "imagens/projetos/placeholder.svg",
-      tags: ["HTML", "CSS", "JavaScript"],
-      status: "no-ar",
-      link: "",
+      nome: "Neuropsicóloga",
+      segmento: "Saúde",
+      tipo: "Site institucional",
+      link: "https://psicra.com",
+      resultado: "[resultado ou status]",
+      imagem: "imagens/projetos/psicra.webp",
     },
     {
-      titulo: "[Nome do projeto 2]",
-      descricao: "[Descrição curta: o que é, para quem e qual problema resolve.]",
+      nome: "Fondly Sublimados",
+      segmento: "Produtos personalizados",
+      tipo: "Loja online",
+      link: "[link]",
+      resultado: "[status]",
       imagem: "imagens/projetos/placeholder.svg",
-      tags: ["Landing page", "Meta Pixel"],
-      status: "em-desenvolvimento",
-      link: "",
     },
     {
-      titulo: "[Nome do projeto 3]",
-      descricao: "[Descrição curta: o que é, para quem e qual problema resolve.]",
+      nome: "Village Trinta e Três",
+      segmento: "Bar e restaurante",
+      tipo: "Site e cardápio digital",
+      link: "[link]",
+      resultado: "[status]",
       imagem: "imagens/projetos/placeholder.svg",
-      tags: ["N8N", "Automação"],
-      status: "concluido",
-      link: "",
+    },
+    {
+      nome: "Imobiliária",
+      segmento: "Imóveis",
+      tipo: "Tráfego pago no Meta Ads",
+      resultado: "[resultado]",
+    },
+    {
+      nome: "Construtora",
+      tipo: "[o que foi feito]",
+      resultado: "[resultado]",
+    },
+    {
+      nome: "Clínica de estética",
+      tipo: "[o que foi feito]",
+      resultado: "[resultado]",
+    },
+    {
+      nome: "Farmácia",
+      tipo: "[o que foi feito]",
+      resultado: "[resultado]",
     },
   ],
 };

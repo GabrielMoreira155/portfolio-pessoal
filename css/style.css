@@ -30,7 +30,7 @@
 :root {
   color-scheme: dark;
   --bg: #0b0d11;
-  --bg-glow: rgba(198, 241, 53, 0.05);
+  --bg-glow: rgba(198, 241, 53, 0.02);
   --surface: #12151b;
   --surface-2: #161a21;
   --surface-3: #1c2129;
@@ -220,7 +220,16 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 /* Sobre a hero animada: sem desfoque de fundo (caro), fundo preto sólido */
 .header.sobre-hero { background: rgba(0, 0, 0, 0.92); backdrop-filter: none; -webkit-backdrop-filter: none; }
 .nav { display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 16px; }
-.brand { font-family: var(--font-display); font-weight: 700; font-size: 18px; letter-spacing: -0.03em; text-decoration: none; }
+.brand { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 700; font-size: 18px; letter-spacing: -0.03em; text-decoration: none; }
+.brand-nome { white-space: nowrap; }
+/* celular estreito: só o monograma no topo (o nome aparece na hero) */
+@media (max-width: 419px) { .brand-nome { display: none; } }
+/* monograma GM (o mesmo desenho do favicon) */
+.brand-mark {
+  flex: none; display: grid; place-items: center; width: 32px; height: 32px;
+  border-radius: 9px; background: #0a0a0a; border: 1px solid rgba(198, 241, 53, 0.35);
+  color: var(--accent); font-size: 14px; font-weight: 700; letter-spacing: -0.04em; line-height: 1;
+}
 .nav-links { display: none; gap: 28px; }
 .nav-links a { position: relative; font-size: 14px; color: var(--text-2); text-decoration: none; transition: color .3s ease-out; }
 .nav-links a::after { content: ""; position: absolute; left: 0; bottom: -8px; height: 1px; width: 0; background: var(--accent); opacity: .7; transition: width .3s ease-out; }
@@ -234,7 +243,8 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 }
 @media (max-width: 360px) {
   .nav { gap: 8px; }
-  .brand { font-size: 15px; white-space: nowrap; }
+  .brand { font-size: 15px; white-space: nowrap; gap: 8px; }
+  .brand-mark { width: 28px; height: 28px; font-size: 12px; }
   .nav-actions { gap: 6px; }
   .nav-actions .btn-sm { padding: 0 12px; font-size: 13px; }
 }
@@ -309,7 +319,7 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 /* brilho verde-limão atrás do card, "respirando" devagar */
 .hero-brilho {
   position: absolute; inset: 0;
-  background: radial-gradient(42% 60% at 76% 50%, rgba(198, 241, 53, 0.19), transparent 72%);
+  background: radial-gradient(42% 60% at 76% 50%, rgba(198, 241, 53, 0.08), transparent 72%);
   animation: respirar 9s ease-in-out infinite;
 }
 @keyframes respirar {
@@ -333,7 +343,7 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 .hero-piso {
   position: absolute; left: -50%; right: -50%; bottom: 0; height: 110%;
   background-image:
-    linear-gradient(to right, rgba(198, 241, 53, 0.3) 1px, transparent 1px),
+    linear-gradient(to right, rgba(198, 241, 53, 0.12) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.2) 1px, transparent 1px);
   background-size: 80px 80px;
   background-position: center bottom;
@@ -354,8 +364,8 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
   left: calc(50% - 41px + var(--k) * 80px);
   /* cabeça clara no topo, cauda longa sumindo para trás */
   background: linear-gradient(to top,
-    rgba(198, 241, 53, 0) 0, rgba(198, 241, 53, 0.2) 110px,
-    rgba(198, 241, 53, 0.95) 234px, #f4ffd1 240px);
+    rgba(198, 241, 53, 0) 0, rgba(198, 241, 53, 0.08) 110px,
+    rgba(198, 241, 53, 0.4) 234px, rgba(244, 255, 209, 0.5) 240px);
   transform-origin: calc(41px - var(--k) * 80px) 100%;
   transform: perspective(900px) rotateX(62deg) translateY(40%);
   opacity: 0;
@@ -376,23 +386,23 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 .raio {
   position: absolute; opacity: 0;
   /* halo fixo (desenhado uma vez; a animação só move a camada) */
-  filter: drop-shadow(0 0 3px rgba(198, 241, 53, 0.55));
+  filter: drop-shadow(0 0 3px rgba(198, 241, 53, 0.2));
   animation: var(--dur, 10s) linear var(--atraso, 0s) infinite;
 }
 .raio-v {
   top: 0; width: 2px; height: 170px;
   left: calc(50% - var(--passo) / 2 - 0.5px + var(--c) * var(--passo));
   background: linear-gradient(to bottom,
-    rgba(198, 241, 53, 0) 0, rgba(198, 241, 53, 0.35) 45%,
-    rgba(198, 241, 53, 1) 96%, #fbffe8 100%);
+    rgba(198, 241, 53, 0) 0, rgba(198, 241, 53, 0.12) 45%,
+    rgba(198, 241, 53, 0.4) 96%, rgba(251, 255, 232, 0.5) 100%);
   animation-name: descer;
 }
 .raio-h {
   left: 0; height: 2px; width: 220px;
   top: calc(var(--m) * var(--passo) - 0.5px);
   background: linear-gradient(to right,
-    rgba(198, 241, 53, 0) 0, rgba(198, 241, 53, 0.35) 45%,
-    rgba(198, 241, 53, 1) 96%, #fbffe8 100%);
+    rgba(198, 241, 53, 0) 0, rgba(198, 241, 53, 0.12) 45%,
+    rgba(198, 241, 53, 0.4) 96%, rgba(251, 255, 232, 0.5) 100%);
   animation-name: atravessar;
 }
 @keyframes descer {
@@ -416,7 +426,7 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
   transition: opacity .5s ease;
   will-change: transform;
   background:
-    radial-gradient(closest-side, rgba(214, 248, 104, 0.16), rgba(198, 241, 53, 0.06) 45%, transparent 100%);
+    radial-gradient(closest-side, rgba(214, 248, 104, 0.06), rgba(198, 241, 53, 0.025) 45%, transparent 100%);
 }
 .hero-mouse.ativo { opacity: 1; }
 @media (hover: none), (pointer: coarse) { .hero-mouse { display: none; } }
@@ -427,7 +437,7 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 /* linha de luz na base da hero, fazendo a transição para a seção seguinte */
 .hero-fundo::after {
   content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(198, 241, 53, 0.35) 50%, transparent);
+  background: linear-gradient(90deg, transparent, rgba(198, 241, 53, 0.15) 50%, transparent);
 }
 @media (max-width: 1199px) {
   /* empilhado: o card fica embaixo, então o brilho verde vai junto */
@@ -438,7 +448,7 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
       #000;
   }
   .hero-brilho {
-    background: radial-gradient(70% 30% at 50% 78%, rgba(198, 241, 53, 0.12), transparent 72%);
+    background: radial-gradient(70% 30% at 50% 78%, rgba(198, 241, 53, 0.05), transparent 72%);
   }
   .hero-piso, .hero-fluxos { height: 70%; }
   /* empilhado: grade de 44px e só as colunas (linhas cruzariam o texto) */
@@ -504,7 +514,7 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
   .hero .funnel-line { top: 80px; bottom: 44px; }
   .hero .stage-body { display: flex; align-items: center; gap: 12px; }
   .hero .bar { height: 40px; flex: none; width: calc(var(--w) * 0.5 + 45px); min-width: max-content; }
-  .hero .stage-body small { margin-top: 0; white-space: nowrap; }
+  .hero .stage-body small { margin-top: 0; min-width: 0; line-height: 1.35; }
 }
 /* em telas largas o card avança um pouco sobre a margem direita */
 @media (min-width: 1440px) {
@@ -514,12 +524,11 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 .hero .lead { color: #aebbd0; text-wrap: pretty; }
 .actions { margin-top: 32px; display: flex; flex-wrap: wrap; gap: 12px; }
 @media (max-width: 480px) { .actions .btn { flex: 1 1 100%; } }
-/* Na hero os dois botões cabem lado a lado até ~350px */
+/* Na hero, no celular, um botão embaixo do outro, na largura toda */
 @media (max-width: 480px) {
   .hero .actions { gap: 10px; }
-  .hero .actions .btn { flex: 1 1 0; min-width: 0; padding: 0 14px; }
+  .hero .actions .btn { flex: 1 1 100%; }
 }
-@media (max-width: 349px) { .hero .actions .btn { flex: 1 1 100%; } }
 
 /* Painel (moldura dupla do mockup Pulsedesk) */
 .panel {
@@ -595,7 +604,7 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 /* Entrada: ao abrir o site, as informações da hero aparecem uma depois da
    outra (etiqueta, título, texto, botões, card e depois os números).
    Só opacity e transform, uma vez só. */
-.hero-copy > *, .hero .funnel-panel, .servicos-titulo, .servico {
+.hero-copy > *, .hero .funnel-panel, .servicos-titulo, .servico, .numeros .stat {
   animation: entrar .8s var(--ease) both;
 }
 .hero-copy > :nth-child(1) { animation-delay: .05s; }
@@ -603,6 +612,9 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 .hero-copy > :nth-child(3) { animation-delay: .3s; }
 .hero-copy > :nth-child(4) { animation-delay: .45s; }
 .hero .funnel-panel { animation-name: entrar-card; animation-duration: 1s; animation-delay: .35s; }
+.numeros .stat:nth-child(1) { animation-delay: .65s; }
+.numeros .stat:nth-child(2) { animation-delay: .75s; }
+.numeros .stat:nth-child(3) { animation-delay: .85s; }
 .servicos-titulo { animation-delay: .65s; }
 .servico:nth-child(1) { animation-delay: .75s; }
 .servico:nth-child(2) { animation-delay: .85s; }
@@ -611,7 +623,7 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 @keyframes entrar { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 @keyframes entrar-card { from { opacity: 0; transform: translateY(24px) scale(0.98); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) {
-  .hero-copy > *, .hero .funnel-panel, .servicos-titulo, .servico { animation: none; }
+  .hero-copy > *, .hero .funnel-panel, .servicos-titulo, .servico, .numeros .stat { animation: none; }
 }
 
 /* Celular: funil mais baixo e menos denso, mesmo conteúdo */
@@ -668,8 +680,8 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 .servico { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; color: var(--text); }
 .servico-icone {
   flex: none; display: grid; place-items: center; width: 34px; height: 34px;
-  border-radius: 10px; color: var(--accent);
-  background: var(--accent-soft); border: 1px solid var(--accent-soft-2);
+  border-radius: 10px; color: var(--text-2);
+  background: var(--surface-3); border: 1px solid var(--line-2);
 }
 @media (max-width: 380px) { .servico { font-size: 14px; } .servico-icone { width: 30px; height: 30px; } }
 @media (min-width: 640px) and (max-width: 1023px) {
@@ -689,6 +701,23 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
   .servico { padding-inline: 28px; font-size: 16px; }
   .servico:first-child { padding-left: 28px; border-left: 1px solid var(--line); }
 }
+
+/* Faixa de números: 3 colunas no desktop, um embaixo do outro no celular */
+.stats-grid { display: grid; grid-template-columns: 1fr; padding-inline: 0; }
+.stat { padding: 26px var(--pad); border-bottom: 1px solid var(--line); }
+.stat:last-child { border-bottom: 0; }
+.stat-value {
+  display: block; font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(1.9rem, 5vw, 2.7rem); line-height: 1; letter-spacing: -0.04em;
+}
+.stat-text { margin-top: 10px; font-size: 14px; line-height: 1.45; color: var(--text-2); max-width: 19rem; }
+@media (min-width: 768px) {
+  .stats-grid { grid-template-columns: repeat(3, 1fr); padding-inline: var(--pad); }
+  .stat { padding: 34px 28px; border-bottom: 0; border-right: 1px solid var(--line); }
+  .stat:first-child { padding-left: 0; }
+  .stat:last-child { border-right: 0; }
+}
+.numeros + .stats { border-top: 0; }
 
 /* ---------- Seções ---------- */
 .section { padding: 80px 0; border-top: 1px solid var(--line); }
@@ -766,6 +795,15 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 a.project-link:hover svg { transform: translate(2px, -2px); }
 .project-link.disabled { color: var(--text-3); font-weight: 500; }
 .project-body .project-link { margin-top: auto; }
+.project-result { margin-top: 14px; font-size: 15px; font-weight: 600; color: var(--text); }
+.project-tags + .project-result { margin-top: 14px; }
+.project-result + .project-link { margin-top: 18px; }
+/* cards sem print (tráfego e outros): mais baixos, 4 por linha no desktop */
+.projects-compactos { margin-top: 20px; }
+@media (min-width: 1100px) { .projects-compactos { grid-template-columns: repeat(4, 1fr); } }
+.project-compacto { padding: 0; }
+.project-compacto .project-body { padding: 24px; }
+.project-compacto .project-tags { margin-top: 12px; }
 .project-tags + .project-link { margin-top: 20px; }
 
 /* ---------- Como trabalho ---------- */
@@ -787,12 +825,22 @@ a.project-link:hover svg { transform: translate(2px, -2px); }
 .facts dt { font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3); padding-top: 3px; }
 .facts dd { font-size: 16px; font-weight: 500; }
 
+/* ---------- Virtus Apex ---------- */
+/* Único lugar do site com a logo (prateada) da Virtus, pequena */
+.virtus { padding: 32px 24px; display: grid; gap: 32px; }
+.virtus-logo { margin-top: 22px; width: auto; height: 26px; opacity: 0.9; }
+.virtus h2 { margin-top: 18px; max-width: 16ch; }
+.virtus .section-text { margin-top: 16px; max-width: 36rem; }
+.virtus .section-text + .section-text { margin-top: 12px; }
+@media (min-width: 640px) { .virtus { padding: 48px; } }
+@media (min-width: 1024px) { .virtus { grid-template-columns: 1fr auto; align-items: end; padding: 56px; } .virtus .cta-actions { flex-direction: column; } }
+
 /* ---------- Contato ---------- */
 .section-last { padding-bottom: 72px; }
 .cta { padding: 32px 24px; display: grid; gap: 32px; overflow: hidden; }
 .cta::after {
   content: ""; position: absolute; right: -120px; top: -140px; width: 360px; height: 360px;
-  border-radius: 50%; background: var(--accent-soft-2); filter: blur(80px); pointer-events: none;
+  border-radius: 50%; background: rgba(198, 241, 53, 0.07); filter: blur(80px); pointer-events: none;
 }
 .cta-copy, .cta-actions { position: relative; z-index: 1; }
 .cta h2 { max-width: 18ch; }
