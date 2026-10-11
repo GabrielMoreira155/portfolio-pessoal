@@ -152,12 +152,15 @@
     return (
       '<article class="card project' + (p.imagem ? "" : " project-compacto") + '">' +
         (p.imagem
-          ? '<div class="project-shot"><img src="' + attr(p.imagem) + '" alt="Print do site ' + attr(p.nome) + '" loading="lazy" decoding="async" width="1200" height="750"></div>'
+          ? '<div class="notebook">' +
+              '<div class="notebook-tela"><img src="' + attr(p.imagem) + '" alt="Print do site ' + attr(p.nome) + '" loading="lazy" decoding="async" width="1200" height="750"></div>' +
+              '<div class="notebook-base"></div>' +
+            "</div>"
           : "") +
         '<div class="project-body">' +
           "<h3>" + txt(p.nome) + "</h3>" +
           '<ul class="project-tags">' + tags + "</ul>" +
-          (p.resultado ? '<p class="project-result">' + txt(p.resultado) + "</p>" : "") +
+          (p.nota ? '<p class="project-result">' + txt(p.nota) + "</p>" : "") +
           link +
         "</div>" +
       "</article>"

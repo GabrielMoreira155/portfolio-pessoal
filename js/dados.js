@@ -20,7 +20,7 @@ window.DADOS = {
     virtusInstagram: "[perfil da Virtus Apex]",
   },
 
-  // Números em destaque, logo abaixo do hero
+  // Números em destaque (faixa tirada do site a pedido; ficam guardados aqui)
   numeros: [
     { valor: "6", texto: "segmentos atendidos" },
     { valor: "+118,8%", texto: "nos resultados de uma campanha no Meta Ads" },
@@ -79,9 +79,9 @@ window.DADOS = {
     Projetos (seção 01 · O que eu já construí)
     nome, segmento, tipo: textos do card
     link: endereço completo; deixe entre [colchetes] enquanto não tiver
-    resultado: resultado ou status (o que aparecer aqui fica em destaque)
-    imagem: print do site em imagens/projetos/ (ideal: .webp, 1200x750).
-            Sem imagem, o card fica compacto (bom para tráfego pago).
+    nota: linha em destaque no card
+    imagem: print do site em imagens/projetos/ (ideal: .webp, 1200x750),
+            mostrado dentro de um notebook. Sem imagem, o card fica compacto.
   */
   projetos: [
     {
@@ -89,7 +89,7 @@ window.DADOS = {
       segmento: "Saúde",
       tipo: "Site institucional",
       link: "https://psicra.com",
-      resultado: "[resultado ou status]",
+      nota: "Em parceria com a Virtus Apex",
       imagem: "imagens/projetos/psicra.webp",
     },
     {
@@ -97,37 +97,31 @@ window.DADOS = {
       segmento: "Produtos personalizados",
       tipo: "Loja online",
       link: "[link]",
-      resultado: "[status]",
-      imagem: "imagens/projetos/placeholder.svg",
+      nota: "Em parceria com a Virtus Apex",
+      imagem: "imagens/projetos/fondly.webp",
     },
     {
-      nome: "Village Trinta e Três",
-      segmento: "Bar e restaurante",
-      tipo: "Site e cardápio digital",
-      link: "[link]",
-      resultado: "[status]",
-      imagem: "imagens/projetos/placeholder.svg",
-    },
-    {
-      nome: "Imobiliária",
+      nome: "Residencial Morada dos Sonhos",
       segmento: "Imóveis",
       tipo: "Tráfego pago no Meta Ads",
-      resultado: "[resultado]",
+      link: "[link]",
+      nota: "Em parceria com a Virtus Apex",
+      imagem: "imagens/projetos/morada-dos-sonhos.webp",
     },
     {
       nome: "Construtora",
       tipo: "[o que foi feito]",
-      resultado: "[resultado]",
+      nota: "Em parceria com a Virtus Apex",
     },
     {
       nome: "Clínica de estética",
       tipo: "[o que foi feito]",
-      resultado: "[resultado]",
+      nota: "Em parceria com a Virtus Apex",
     },
     {
       nome: "Farmácia",
       tipo: "[o que foi feito]",
-      resultado: "[resultado]",
+      nota: "Em parceria com a Virtus Apex",
     },
   ],
 };
