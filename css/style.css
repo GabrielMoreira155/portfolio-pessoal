@@ -150,7 +150,7 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
   margin: -260px 0 0 -260px; opacity: 0;
   transition: opacity .5s ease;
   will-change: transform;
-  background: radial-gradient(closest-side, rgba(214, 248, 104, 0.06), rgba(198, 241, 53, 0.025) 45%, transparent 100%);
+  background: radial-gradient(closest-side, rgba(214, 248, 104, 0.16), rgba(198, 241, 53, 0.07) 45%, transparent 100%);
 }
 .site-mouse.ativo { opacity: 1; }
 @media (max-width: 1199px) {
@@ -484,7 +484,7 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
   transition: opacity .5s ease;
   will-change: transform;
   background:
-    radial-gradient(closest-side, rgba(214, 248, 104, 0.06), rgba(198, 241, 53, 0.025) 45%, transparent 100%);
+    radial-gradient(closest-side, rgba(214, 248, 104, 0.16), rgba(198, 241, 53, 0.07) 45%, transparent 100%);
 }
 .hero-mouse.ativo { opacity: 1; }
 @media (hover: none), (pointer: coarse) { .hero-mouse { display: none; } }
