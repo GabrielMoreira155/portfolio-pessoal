@@ -910,6 +910,10 @@ a.project-link:hover svg { transform: translate(2px, -2px); }
 .project-tags + .project-link { margin-top: 20px; }
 
 /* ---------- Além do site ---------- */
+/* continuação de Projetos: as duas seções ficam mais próximas, sem a linha */
+#projetos { padding-bottom: 40px; }
+#alem-do-site { padding-top: 40px; border-top: 0; }
+@media (min-width: 1024px) { #projetos { padding-bottom: 56px; } #alem-do-site { padding-top: 56px; } }
 .alem { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); }
 .alem-card { padding: 26px; display: flex; flex-direction: column; gap: 20px; }
 .alem-topo { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
