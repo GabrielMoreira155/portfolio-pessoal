@@ -10,11 +10,11 @@
 window.DADOS = {
   contato: {
     // Só números: 55 + DDD + número. Ex.: "5562999999999"
-    whatsapp: "[55DDDNUMERO]",
+    whatsapp: "5562996839199",
     mensagemWhatsapp:
       "Oi, Gabriel! Vi seu site e quero entender onde meus clientes estão se perdendo.",
     // Sem o @. Ex.: "gabrielmoreira"
-    instagram: "[seuperfil]",
+    instagram: "gab_lew15",
     // Virtus Apex: endereço completo do site e @ do Instagram (sem o @)
     virtusSite: "[link do site da Virtus Apex]",
     virtusInstagram: "[perfil da Virtus Apex]",
