@@ -171,30 +171,88 @@
     listaC.innerHTML = D.projetos.filter(function (p) { return !p.imagem; }).map(cardProjeto).join("");
   }
 
-  // Além do site: uma linha por empresa (número, empresa e o que foi feito)
+  // Além do site: mapa do funil por cliente. Colunas = etapas do funil do
+  // topo; cada cliente é uma linha com os pontos acesos onde houve trabalho.
+  var ETAPAS = [
+    { id: "trafego", nome: "Tráfego", sub: "Meta Ads e Google Ads", icone: icones.anuncio, linha: true },
+    { id: "site", nome: "Site", sub: "Site ou landing page", icone: icones.site, linha: true },
+    { id: "atendimento", nome: "Atendimento", sub: "WhatsApp e automação", icone: '<path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20.5l1.7-5.2A8.5 8.5 0 1 1 21 11.5Z"/>', linha: true },
+    { id: "processo", nome: "Processo", sub: "Estruturação comercial", icone: icones.comercial, linha: true }
+  ];
+  function iconeEtapa(e) {
+    return '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + e.icone + "</svg>";
+  }
+  var cabeca = document.querySelector(".mapa-cabeca");
+  if (cabeca) {
+    cabeca.innerHTML = '<span></span><div class="mapa-colunas">' + ETAPAS.map(function (e) {
+      return '<div class="mapa-col"><span class="mapa-col-nome">' + iconeEtapa(e) + e.nome + '</span><span class="mapa-col-sub">' + e.sub + "</span></div>";
+    }).join("") + "</div>";
+  }
   var listaA = document.getElementById("lista-alem");
   if (listaA && D.alemDoSite) {
     listaA.innerHTML = D.alemDoSite.map(function (c, i) {
+      var et = c.etapas || {};
+      var acesas = ETAPAS.map(function (e, k) { return et[e.id] ? k : -1; }).filter(function (k) { return k >= 0; });
+      var trilha = "";
+      if (acesas.length > 1) {
+        for (var k = acesas[0]; k < acesas[acesas.length - 1]; k++) {
+          var cheio = et[ETAPAS[k].id] && et[ETAPAS[k + 1].id];
+          trilha += '<span class="mapa-trecho' + (cheio ? "" : " mapa-trecho-vazio") + '" style="--k:' + k + '"></span>';
+        }
+      }
       return (
-        '<li class="alem-linha">' +
-          '<span class="alem-num">' + (i < 9 ? "0" : "") + (i + 1) + "</span>" +
-          '<div class="alem-empresa"><h3>' + txt(c.nome) + "</h3>" +
-            (c.segmento ? "<p>" + txt(c.segmento) + "</p>" : "") +
+        '<li class="mapa-linha" style="--linha:' + i + '">' +
+          '<div class="mapa-cliente">' +
+            '<span class="alem-num">' + (i < 9 ? "0" : "") + (i + 1) + "</span>" +
+            "<div><h3>" + txt(c.nome) + "</h3>" + (c.segmento ? "<p>" + txt(c.segmento) + "</p>" : "") + "</div>" +
           "</div>" +
-          '<ul class="alem-feitos">' +
-            (c.feitos || []).map(function (f) { return "<li>" + txt(f.texto) + "</li>"; }).join("") +
-          "</ul>" +
-          (c.comprovante
-            ? '<figure class="alem-comprovante"><img src="' + attr(c.comprovante) + '" alt="Resultado: ' + attr(c.nome) + '" loading="lazy" decoding="async"><figcaption>Resultado</figcaption></figure>'
-            : "") +
+          '<div class="mapa-colunas mapa-pontos">' + trilha +
+            ETAPAS.map(function (e, k) {
+              var feito = et[e.id];
+              var rotulo = '<span class="mapa-rotulo">' + iconeEtapa(e) + e.nome + "</span>";
+              if (!feito) {
+                return '<div class="mapa-etapa">' + rotulo +
+                  '<span class="ponto" role="img" aria-label="' + e.nome + ': não houve trabalho nesta etapa"></span></div>';
+              }
+              var idb = "balao-" + i + "-" + k;
+              return '<div class="mapa-etapa mapa-col-' + k + '">' + rotulo +
+                '<button type="button" class="ponto aceso" style="--col:' + k + '" aria-describedby="' + idb + '" aria-label="' + e.nome + '">' +
+                  '<span class="balao" role="tooltip" id="' + idb + '">' + txt(feito) + "</span>" +
+                "</button></div>";
+            }).join("") +
+          "</div>" +
         "</li>"
       );
     }).join("");
+
+    // toque: abre o balão do ponto tocado e fecha os outros
+    listaA.addEventListener("click", function (e) {
+      var b = e.target.closest(".ponto.aceso");
+      listaA.querySelectorAll(".ponto.aberto").forEach(function (o) { if (o !== b) o.classList.remove("aberto"); });
+      if (b) b.classList.toggle("aberto");
+    });
+    document.addEventListener("click", function (e) {
+      if (!e.target.closest("#lista-alem .ponto.aceso")) {
+        listaA.querySelectorAll(".ponto.aberto").forEach(function (o) { o.classList.remove("aberto"); });
+      }
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") listaA.querySelectorAll(".ponto.aberto").forEach(function (o) { o.classList.remove("aberto"); });
+    });
+  }
+
+  // Enquanto o mapa do funil está na tela, os pulsos de luz do fundo somem
+  // (eles cruzariam o painel e os textos da seção). Só troca uma classe.
+  var secMapa = document.getElementById("alem-do-site");
+  if (secMapa && "IntersectionObserver" in window) {
+    new IntersectionObserver(function (itens) {
+      document.documentElement.classList.toggle("sem-pulsos", itens[0].isIntersecting);
+    }, { rootMargin: "-20% 0px -20% 0px" }).observe(secMapa);
   }
 
   // Projetos aparecem ao rolar: título e cards sobem em sequência e a tela
   // de cada notebook "abre". Só transform e opacity, uma vez por elemento.
-  var revelaveis = document.querySelectorAll("#projetos .section-head > *, #projetos .project, #alem-do-site .section-head > *, #alem-do-site .alem-linha");
+  var revelaveis = document.querySelectorAll("#projetos .section-head > *, #projetos .project, #alem-do-site .section-head > *, #mapa-funil");
   var semMovimento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if ("IntersectionObserver" in window && !semMovimento && revelaveis.length) {
     document.documentElement.classList.add("js-revelar");
@@ -211,6 +269,8 @@
         obs.unobserve(el);
         // depois de aparecer, tira o atraso para o hover responder na hora
         setTimeout(function () { el.style.setProperty("--atraso-revelar", "0ms"); }, 1700);
+        // mapa do funil: depois que todos os pontos acendem, tira os atrasos
+        if (el.id === "mapa-funil") setTimeout(function () { el.classList.add("pronto"); }, 2600);
       });
     }, { rootMargin: "0px 0px -12% 0px", threshold: 0.12 });
     revelaveis.forEach(function (el) { obs.observe(el); });

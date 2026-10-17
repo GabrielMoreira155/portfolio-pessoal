@@ -932,35 +932,156 @@ a.project-link:hover svg { transform: translate(2px, -2px); }
 #projetos { padding-bottom: 40px; }
 #alem-do-site { padding-top: 40px; border-top: 0; }
 @media (min-width: 1024px) { #projetos { padding-bottom: 56px; } #alem-do-site { padding-top: 56px; } }
-/* lista editorial: número, empresa e o que foi feito, separados por linhas
-   finas (no lugar da grade de cards com ícones) */
-.alem { list-style: none; margin: 0; padding: 0; border-bottom: 1px solid var(--line); }
-.alem-linha {
-  position: relative; display: grid; grid-template-columns: 44px 1fr; gap: 6px 16px;
-  padding: 24px 0; border-top: 1px solid var(--line);
+/* Mapa do funil por cliente: colunas = etapas do funil do topo (mesmos
+   marcadores: círculo com contorno apagado, verde-limão com anel aceso).
+   Base: o mesmo painel dos cards de "Como eu penso" (fundo, borda, raio).
+   Duas variações: .mapa-discreta e .mapa-marcada. */
+.alem-num { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--text-3); font-variant-numeric: tabular-nums; transition: color .2s ease; }
+.mapa { --trilho-l: 52px; --trilho-bg: rgba(255, 255, 255, 0.022); --trilho-borda: transparent; --hover-bg: rgba(255, 255, 255, 0.025); }
+.mapa-marcada { --trilho-bg: rgba(255, 255, 255, 0.04); --trilho-borda: rgba(255, 255, 255, 0.06); --hover-bg: rgba(198, 241, 53, 0.035); }
+.mapa-cabeca { display: none; }
+.mapa-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+
+/* celular: um cartão por cliente, no estilo dos cards */
+.mapa-linha {
+  position: relative; padding: 20px 18px 22px;
+  background: linear-gradient(180deg, var(--surface), var(--surface-2));
+  border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow);
+  transition: background-color .2s ease;
 }
-.alem-num { grid-row: span 2; padding-top: 4px; font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--text-3); font-variant-numeric: tabular-nums; transition: color .2s ease; }
-.alem-empresa h3 { font-size: 22px; line-height: 1.15; letter-spacing: -0.03em; }
-.alem-empresa p { margin-top: 4px; font-size: 14px; color: var(--text-3); }
-.alem-feitos { list-style: none; display: grid; gap: 4px; margin-top: 10px; }
-.alem-feitos li { font-size: 16px; line-height: 1.5; color: var(--text-2); }
-.alem-comprovante { grid-column: 2; margin: 14px 0 0; max-width: 520px; }
-.alem-comprovante img { width: 100%; border-radius: var(--radius-md); border: 1px solid var(--line); }
-.alem-comprovante figcaption { margin-top: 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3); }
-@media (min-width: 900px) {
-  .alem-linha { grid-template-columns: 72px minmax(0, 1fr) minmax(0, 1.1fr); align-items: baseline; gap: 0 32px; padding: 30px 0; }
-  .alem-num { grid-row: auto; padding-top: 0; }
-  .alem-empresa h3 { font-size: 26px; }
-  .alem-feitos { margin-top: 0; }
-  .alem-feitos li { font-size: 17px; }
-  .alem-comprovante { grid-column: 3; }
+.mapa-cliente { display: flex; align-items: baseline; gap: 14px; }
+.mapa-cliente h3 { font-size: 20px; line-height: 1.15; letter-spacing: -0.03em; transition: color .2s ease; }
+.mapa-cliente p { margin-top: 3px; font-size: 14px; color: var(--text-3); }
+.mapa-colunas { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.mapa-pontos { position: relative; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
+.mapa-etapa { position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.mapa-rotulo { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; color: var(--text-3); white-space: nowrap; }
+.mapa-rotulo svg { flex: none; width: 15px; height: 15px; }
+/* trilho de cada coluna (celular: atrás do rótulo e do ponto) */
+.mapa-etapa::before {
+  content: ""; position: absolute; z-index: 0; top: -6px; bottom: -8px; left: 50%;
+  width: var(--trilho-l); transform: translateX(-50%); border-radius: 12px;
+  background: var(--trilho-bg); box-shadow: inset 1px 0 0 var(--trilho-borda), inset -1px 0 0 var(--trilho-borda);
+  pointer-events: none;
 }
-/* no hover a linha acende o número e a empresa (cor, sem deslocar nada) */
-.alem-empresa h3 { transition: color .2s ease; }
+.mapa-rotulo, .mapa-etapa .ponto { position: relative; z-index: 1; }
+
+/* o ponto: mesmo marcador do funil */
+.ponto {
+  position: relative; z-index: 2; display: block; flex: none;
+  width: 22px; height: 22px; padding: 0; border-radius: 50%;
+  background: var(--surface); border: 2px solid var(--line-2);
+  font: inherit; color: inherit;
+}
+button.ponto { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+button.ponto::before { content: ""; position: absolute; inset: -11px; border-radius: 50%; }
+.ponto.aceso { border-color: var(--accent-line); }
+.ponto.aceso::after {
+  content: ""; position: absolute; inset: -2px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 0 5px var(--accent-soft), 0 0 18px rgba(198, 241, 53, 0.45);
+  transition: transform .45s var(--ease), opacity .3s ease;
+  transition-delay: calc(var(--linha, 0) * 240ms + var(--col, 0) * 90ms + 200ms);
+}
+
+/* caminho: um trecho entre cada par de etapas vizinhas.
+   Cheio e verde quando as duas estão acesas; tracejado e apagado quando há
+   uma etapa apagada no caminho (a linha nunca passa "acesa" por cima dela). */
+.mapa-trecho {
+  position: absolute; z-index: 1; height: 2px; bottom: 10px;
+  left: calc((var(--k) + 0.5) * 25%); width: 25%;
+  background: var(--accent-line);
+  transform-origin: left center;
+  transition: transform .35s var(--ease), opacity .3s ease;
+  transition-delay: calc(var(--linha, 0) * 240ms + var(--k, 0) * 90ms + 300ms);
+}
+.mapa-trecho-vazio {
+  background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.22) 0 4px, transparent 4px 9px);
+}
+
+/* antes de entrar na tela (só quando há animação) */
+.js-revelar #mapa-funil:not(.visivel) .ponto.aceso::after { transform: scale(0.4); opacity: 0; }
+.js-revelar #mapa-funil:not(.visivel) .mapa-trecho { transform: scaleX(0); }
+.js-revelar #mapa-funil:not(.visivel) .mapa-trecho-vazio { transform: none; opacity: 0; }
+#mapa-funil.pronto .ponto.aceso::after, #mapa-funil.pronto .mapa-trecho { transition-delay: 0ms; }
+
+/* balão com o que foi feito naquela etapa */
+.balao {
+  position: absolute; bottom: calc(100% + 12px); left: 50%; z-index: 5;
+  width: max-content; max-width: 210px; padding: 8px 12px; border-radius: 10px;
+  background: #0b0d10; border: 1px solid rgba(198, 241, 53, 0.35);
+  box-shadow: 0 12px 30px -8px rgba(0, 0, 0, 0.7);
+  font-size: 13px; font-weight: 600; line-height: 1.35; text-align: center; color: var(--text);
+  white-space: normal; pointer-events: none;
+  opacity: 0; transform: translateX(-50%) translateY(4px) scale(0.97); transform-origin: 50% 100%;
+  transition: opacity .15s ease, transform .15s var(--ease);
+}
+.mapa-col-0 .balao { left: -6px; transform: translateY(4px) scale(0.97); transform-origin: 0 100%; text-align: left; }
+.mapa-col-3 .balao { left: auto; right: -6px; transform: translateY(4px) scale(0.97); transform-origin: 100% 100%; text-align: right; }
+.ponto.aberto .balao, .ponto:focus-visible .balao { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+.mapa-col-0 .ponto.aberto .balao, .mapa-col-0 .ponto:focus-visible .balao,
+.mapa-col-3 .ponto.aberto .balao, .mapa-col-3 .ponto:focus-visible .balao { transform: none; }
+/* o balão aberto fica por cima da linha de baixo */
+.mapa-linha:has(.ponto.aberto), .mapa-linha:hover { z-index: 3; }
 @media (hover: hover) and (pointer: fine) {
-  .alem-linha:hover .alem-num { color: var(--accent); }
-  .alem-linha:hover .alem-empresa h3 { color: #fff; }
+  .ponto.aceso:hover .balao { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+  .mapa-col-0 .ponto.aceso:hover .balao, .mapa-col-3 .ponto.aceso:hover .balao { transform: none; }
+  .mapa-linha:hover { background-color: var(--hover-bg); }
+  .mapa-linha:hover .alem-num { color: var(--accent); }
+  .mapa-linha:hover .mapa-cliente h3 { color: #fff; }
 }
+.mapa-marcada .mapa-linha::after {
+  content: ""; position: absolute; top: -1px; left: 24px; right: 24px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-line), transparent); opacity: .6;
+}
+
+/* desktop: a matriz inteira num painel, com cabeçalho em faixa própria */
+@media (min-width: 900px) {
+  .mapa {
+    position: relative; overflow: hidden;
+    background: linear-gradient(180deg, var(--surface), var(--surface-2));
+    border: 1px solid var(--line); border-radius: var(--radius-xl); box-shadow: var(--shadow);
+  }
+  /* filete de luz no topo, como nos cards */
+  .mapa::before {
+    content: ""; position: absolute; top: -1px; left: 24px; right: 24px; height: 1px; z-index: 2;
+    background: linear-gradient(90deg, transparent, var(--accent-line), transparent); opacity: .7;
+  }
+  .mapa-cabeca, .mapa-linha { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 2fr); align-items: stretch; gap: 32px; padding-inline: 36px; }
+  .mapa-cabeca { padding-block: 22px 18px; border-bottom: 1px solid var(--line); }
+  .mapa-marcada .mapa-cabeca { background: rgba(255, 255, 255, 0.02); }
+  .mapa-col { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+  .mapa-col > * { position: relative; z-index: 1; }
+  .mapa-col-nome { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+  .mapa-col-sub { font-size: 12.5px; color: var(--text-3); }
+  .mapa-lista { gap: 0; }
+  .mapa-linha {
+    padding-block: 26px; background: none; border: 0; border-bottom: 1px solid var(--line);
+    border-radius: 0; box-shadow: none;
+  }
+  .mapa-linha:last-child { border-bottom: 0; }
+  .mapa-marcada .mapa-linha::after { display: none; }
+  .mapa-cliente { align-self: center; }
+  .mapa-cliente h3 { font-size: 24px; }
+  .mapa-pontos { margin: 0; padding: 0; border: 0; align-items: center; }
+  .mapa-etapa { height: 100%; justify-content: center; }
+  .mapa-rotulo { display: none; }
+  .mapa-trecho { bottom: auto; top: calc(50% - 1px); }
+  /* trilhos contínuos: cada célula estica o trilho até as bordas da linha */
+  .mapa-etapa::before { top: -27px; bottom: -27px; border-radius: 0; }
+  .mapa-linha:last-child .mapa-etapa::before { bottom: -26px; }
+  .mapa-col::before {
+    content: ""; position: absolute; z-index: 0; top: -23px; bottom: -19px; left: 50%;
+    width: var(--trilho-l); transform: translateX(-50%);
+    background: var(--trilho-bg); box-shadow: inset 1px 0 0 var(--trilho-borda), inset -1px 0 0 var(--trilho-borda);
+  }
+}
+/* sem animação: tudo aceso e sem transições */
+@media (prefers-reduced-motion: reduce) {
+  .ponto.aceso::after, .mapa-trecho, .balao, .mapa-linha { transition: none; }
+}
+/* pulsos de luz do fundo somem enquanto o mapa está na tela */
+.raio-site { transition: opacity .4s ease; }
+.sem-pulsos .raio-site { opacity: 0 !important; animation-play-state: paused; }
 
 /* ---------- Como trabalho ---------- */
 .steps { list-style: none; display: grid; gap: 16px; }

@@ -133,44 +133,41 @@ window.DADOS = {
   ],
 
   /*
-    Além do site (seção 02): o que mais foi feito em cada empresa.
-    feitos: lista do que foi feito. icone: anuncio, automacao, comercial ou site
-    comprovante: print de resultado em imagens/resultados/ (deixe "" enquanto
-                 não tiver; o espaço só aparece quando houver imagem)
+    Além do site (seção 02): mapa do funil por cliente.
+    etapas: o que foi feito em cada etapa do funil. Deixe "" quando não houve
+    trabalho naquela etapa (o ponto fica apagado). O texto aparece no balão
+    ao passar o mouse ou tocar no ponto.
   */
   alemDoSite: [
     {
       nome: "Residencial Morada dos Sonhos",
       segmento: "Imóveis",
-      feitos: [
-        { icone: "automacao", texto: "Automação do chatbot" },
-        { icone: "anuncio", texto: "Campanhas no Meta Ads" },
-      ],
-      comprovante: "",
+      etapas: {
+        trafego: "Campanhas no Meta Ads",
+        site: "Site",
+        atendimento: "Automação do chatbot",
+        processo: "",
+      },
     },
     {
-      nome: "Neuropsicóloga",
+      nome: "Clínica de neuropsicologia",
       segmento: "Saúde",
-      feitos: [{ icone: "automacao", texto: "Automação" }],
-      comprovante: "",
+      etapas: { trafego: "", site: "Site institucional", atendimento: "Automação", processo: "" },
     },
     {
       nome: "Fondly Sublimados",
       segmento: "Produtos personalizados",
-      feitos: [{ icone: "automacao", texto: "Automação" }],
-      comprovante: "",
+      etapas: { trafego: "", site: "Loja online", atendimento: "Automação", processo: "" },
     },
     {
       nome: "Drogaria Cruzeiro",
       segmento: "Farmácia",
-      feitos: [{ icone: "comercial", texto: "Estruturação de processo comercial" }],
-      comprovante: "",
+      etapas: { trafego: "", site: "Site", atendimento: "", processo: "Estruturação de processo comercial" },
     },
     {
-      nome: "Agência de Marketing Digital para médicos",
+      nome: "Virtus Doctor · projeto próprio",
       segmento: "Marketing médico",
-      feitos: [{ icone: "anuncio", texto: "Estruturação de campanhas no Google Ads" }],
-      comprovante: "",
+      etapas: { trafego: "Estruturação de campanhas no Google Ads", site: "Landing page", atendimento: "", processo: "" },
     },
   ],
 };
