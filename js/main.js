@@ -94,11 +94,7 @@
   if (servicos && D.servicos) {
     servicos.innerHTML = D.servicos.map(function (s) {
       return (
-        '<li class="servico">' +
-          '<span class="servico-icone"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-            (icones[s.icone] || icones.site) + "</svg></span>" +
-          "<span>" + txt(s.nome) + "</span>" +
-        "</li>"
+        '<li class="servico">' + txt(s.nome) + "</li>"
       );
     }).join("");
   }
@@ -147,7 +143,7 @@
           txt(p.link.replace(/^https?:\/\//, "").replace(/\/$/, "")) + seta + "</a>"
       : (p.link ? '<span class="project-link disabled">Link ' + txt(p.link) + "</span>" : "");
     var tags = [p.segmento, p.tipo].filter(Boolean).map(function (t) {
-      return '<li class="tag tag-plain">' + txt(t) + "</li>";
+      return "<li>" + txt(t) + "</li>";
     }).join("");
     return (
       '<article class="card project' + (p.imagem ? "" : " project-compacto") + '">' +
@@ -175,39 +171,37 @@
     listaC.innerHTML = D.projetos.filter(function (p) { return !p.imagem; }).map(cardProjeto).join("");
   }
 
-  // Além do site: um card por empresa com o que mais foi feito
+  // Além do site: uma linha por empresa (número, empresa e o que foi feito)
   var listaA = document.getElementById("lista-alem");
   if (listaA && D.alemDoSite) {
-    listaA.innerHTML = D.alemDoSite.map(function (c) {
+    listaA.innerHTML = D.alemDoSite.map(function (c, i) {
       return (
-        '<article class="card alem-card">' +
-          '<div class="alem-topo"><h3>' + txt(c.nome) + "</h3>" +
-            (c.segmento ? '<span class="tag tag-plain">' + txt(c.segmento) + "</span>" : "") +
+        '<li class="alem-linha">' +
+          '<span class="alem-num">' + (i < 9 ? "0" : "") + (i + 1) + "</span>" +
+          '<div class="alem-empresa"><h3>' + txt(c.nome) + "</h3>" +
+            (c.segmento ? "<p>" + txt(c.segmento) + "</p>" : "") +
           "</div>" +
           '<ul class="alem-feitos">' +
-            (c.feitos || []).map(function (f) {
-              return '<li><span class="servico-icone"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-                (icones[f.icone] || icones.automacao) + "</svg></span><span>" + txt(f.texto) + "</span></li>";
-            }).join("") +
+            (c.feitos || []).map(function (f) { return "<li>" + txt(f.texto) + "</li>"; }).join("") +
           "</ul>" +
           (c.comprovante
             ? '<figure class="alem-comprovante"><img src="' + attr(c.comprovante) + '" alt="Resultado: ' + attr(c.nome) + '" loading="lazy" decoding="async"><figcaption>Resultado</figcaption></figure>'
             : "") +
-        "</article>"
+        "</li>"
       );
     }).join("");
   }
 
   // Projetos aparecem ao rolar: título e cards sobem em sequência e a tela
   // de cada notebook "abre". Só transform e opacity, uma vez por elemento.
-  var revelaveis = document.querySelectorAll("#projetos .section-head > *, #projetos .project, #alem-do-site .section-head > *, #alem-do-site .alem-card");
+  var revelaveis = document.querySelectorAll("#projetos .section-head > *, #projetos .project, #alem-do-site .section-head > *, #alem-do-site .alem-linha");
   var semMovimento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if ("IntersectionObserver" in window && !semMovimento && revelaveis.length) {
     document.documentElement.classList.add("js-revelar");
     revelaveis.forEach(function (el, i) {
       el.classList.add("revelar");
       // atraso em cascata dentro de cada linha de 3 cards
-      el.style.setProperty("--atraso-revelar", (el.classList.contains("project") || el.classList.contains("alem-card") ? (i % 3) * 70 : i * 60) + "ms");
+      el.style.setProperty("--atraso-revelar", (el.classList.contains("project") || el.classList.contains("alem-linha") ? (i % 3) * 70 : i * 60) + "ms");
     });
     var obs = new IntersectionObserver(function (itens) {
       itens.forEach(function (it) {
