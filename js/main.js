@@ -207,7 +207,7 @@
     revelaveis.forEach(function (el, i) {
       el.classList.add("revelar");
       // atraso em cascata dentro de cada linha de 3 cards
-      el.style.setProperty("--atraso-revelar", (el.classList.contains("project") ? (i % 3) * 120 : i * 100) + "ms");
+      el.style.setProperty("--atraso-revelar", (el.classList.contains("project") || el.classList.contains("alem-card") ? (i % 3) * 70 : i * 60) + "ms");
     });
     var obs = new IntersectionObserver(function (itens) {
       itens.forEach(function (it) {

@@ -65,7 +65,10 @@
   --radius-sm: 0.75rem;
   --pad: 20px;
   --maxw: 1280px;
-  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  /* curvas fortes (Emil Kowalski): saída para entradas e respostas,
+     ease-in-out para o que se move na tela */
+  --ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 }
 
 /* ---------- Base ---------- */
@@ -188,7 +191,7 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
   border-radius: 999px; border: 1px solid transparent;
   font: 600 15px/1 var(--font-body);
   text-decoration: none; white-space: nowrap; cursor: pointer;
-  transition: background-color .3s ease-out, border-color .3s ease-out, transform .3s ease-out, color .3s ease-out, box-shadow .3s ease-out;
+  transition: background-color .2s ease, border-color .2s ease, color .2s ease, transform .16s var(--ease);
 }
 .btn-sm { height: 38px; padding: 0 16px; font-size: 14px; }
 .btn-lg { height: 54px; padding: 0 26px; font-size: 16px; }
@@ -196,12 +199,26 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
   background: var(--accent); color: var(--accent-ink);
   box-shadow: 0 0 0 1px rgba(255,255,255,.12) inset, 0 14px 34px -14px var(--accent-line);
 }
-.btn-primary:hover { background: var(--accent-hover); transform: scale(1.03); box-shadow: 0 0 0 1px rgba(255,255,255,.18) inset, 0 20px 44px -14px var(--accent-line); }
-.btn-primary .arrow { transition: transform .3s ease-out; }
-.btn-primary:hover .arrow { transform: translateX(2px); }
+/* o brilho maior do hover fica numa camada própria que só muda de opacidade
+   (animar box-shadow redesenha o botão a cada quadro) */
+.btn-primary { position: relative; isolation: isolate; }
+.btn-primary::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
+  box-shadow: 0 20px 44px -14px var(--accent-line); opacity: 0; transition: opacity .2s ease;
+}
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-primary:hover::after { opacity: 1; }
+.btn-primary .arrow { transition: transform .2s var(--ease); }
+/* crescer no hover só onde existe mouse (no toque o hover "gruda") */
+@media (hover: hover) and (pointer: fine) {
+  .btn-primary:hover { transform: scale(1.03); }
+  .btn-primary:hover .arrow { transform: translateX(2px); }
+}
 .btn-ghost { background: var(--surface); color: var(--text); border-color: var(--line-2); }
-.btn-ghost:hover { transform: scale(1.02); border-color: var(--text-3); background: var(--surface-2); }
-.btn:active { transform: scale(0.98); }
+.btn-ghost:hover { border-color: var(--text-3); background: var(--surface-2); }
+@media (hover: hover) and (pointer: fine) { .btn-ghost:hover { transform: scale(1.02); } }
+/* resposta ao clique: rápida e sutil */
+.btn:active { transform: scale(0.97); transition-duration: .1s; }
 /* Na hero escura, o botão secundário é de vidro, como no Pulsedesk */
 /* Sem backdrop-filter sobre a animação: desfocar um fundo animado a cada
    quadro é caro. Fundo escuro quase opaco no lugar do vidro. */
@@ -289,10 +306,14 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
   color: var(--accent); font-size: 14px; font-weight: 700; letter-spacing: -0.04em; line-height: 1;
 }
 .nav-links { display: none; gap: 28px; }
-.nav-links a { position: relative; font-size: 14px; color: var(--text-2); text-decoration: none; transition: color .3s ease-out; }
-.nav-links a::after { content: ""; position: absolute; left: 0; bottom: -8px; height: 1px; width: 0; background: var(--accent); opacity: .7; transition: width .3s ease-out; }
+.nav-links a { position: relative; font-size: 14px; color: var(--text-2); text-decoration: none; transition: color .2s ease; }
+.nav-links a::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -8px; height: 1px;
+  background: var(--accent); opacity: .7;
+  transform: scaleX(0); transform-origin: left center; transition: transform .25s var(--ease);
+}
 .nav-links a:hover { color: var(--text); }
-.nav-links a:hover::after { width: 100%; }
+.nav-links a:hover::after { transform: scaleX(1); }
 .nav-actions { display: flex; align-items: center; gap: 8px; }
 .menu-toggle {
   display: inline-flex; align-items: center; justify-content: center;
@@ -627,7 +648,7 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 .funnel-runner {
   position: absolute; left: 50%; top: 0; bottom: 0; width: 8px; margin-left: -4px;
   opacity: 0;
-  animation: run 4.8s var(--ease) 2.2s infinite;
+  animation: run 4.8s var(--ease-in-out) 2.2s infinite;
 }
 .funnel-runner::before {
   content: ""; position: absolute; left: 0; top: -4px; width: 8px; height: 8px;
@@ -681,7 +702,7 @@ ul, ol, dl, dd { margin: 0; padding: 0; }
 @keyframes entrar { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 @keyframes entrar-card { from { opacity: 0; transform: translateY(24px) scale(0.98); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) {
-  .hero-copy > *, .hero .funnel-panel, .servicos-titulo, .servico, .numeros .stat { animation: none; }
+  .hero-copy > *, .hero .funnel-panel, .servicos-titulo, .servico, .numeros .stat { animation-name: fade; animation-duration: .4s; }
 }
 
 /* Celular: funil mais baixo e menos denso, mesmo conteúdo */
@@ -861,7 +882,7 @@ a.project-link:hover svg { transform: translate(2px, -2px); }
    Só transform e opacity. */
 .js-revelar .revelar {
   opacity: 0; transform: translateY(28px);
-  transition: opacity .8s var(--ease), transform .8s var(--ease);
+  transition: opacity .6s var(--ease), transform .6s var(--ease);
   transition-delay: var(--atraso-revelar, 0ms);
 }
 .js-revelar .revelar.visivel { opacity: 1; transform: none; }
@@ -872,9 +893,9 @@ a.project-link:hover svg { transform: translate(2px, -2px); }
   transition-delay: calc(var(--atraso-revelar, 0ms) + 250ms);
 }
 .js-revelar .revelar.visivel .notebook-tela { transform: none; opacity: 1; }
-.project { transition: transform .4s var(--ease), border-color .4s var(--ease); }
+.project { transition: transform .3s var(--ease), border-color .2s ease; }
 .project .notebook-tela img { transition: transform .8s var(--ease); }
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
   .js-revelar .project.revelar.visivel:hover, .project:hover { transform: translateY(-6px); border-color: var(--line-2); }
   .project:hover .notebook-tela img { transform: scale(1.05); }
 }
@@ -923,8 +944,8 @@ a.project-link:hover svg { transform: translate(2px, -2px); }
 .alem-comprovante { margin: auto 0 0; }
 .alem-comprovante img { width: 100%; border-radius: var(--radius-md); border: 1px solid var(--line); }
 .alem-comprovante figcaption { margin-top: 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3); }
-.alem-card { transition: transform .4s var(--ease), border-color .4s var(--ease); }
-@media (hover: hover) { .alem-card:hover { transform: translateY(-6px); border-color: var(--line-2); } }
+.alem-card { transition: transform .3s var(--ease), border-color .2s ease; }
+@media (hover: hover) and (pointer: fine) { .alem-card:hover { transform: translateY(-6px); border-color: var(--line-2); } }
 
 /* ---------- Como trabalho ---------- */
 .steps { list-style: none; display: grid; gap: 16px; }
