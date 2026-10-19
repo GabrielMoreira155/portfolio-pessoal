@@ -16,8 +16,8 @@ window.DADOS = {
     // Sem o @. Ex.: "gabrielmoreira"
     instagram: "gab_lew15",
     // Virtus Apex: endereço completo do site e @ do Instagram (sem o @)
-    virtusSite: "[link do site da Virtus Apex]",
-    virtusInstagram: "[perfil da Virtus Apex]",
+    virtusSite: "https://virtusapex.com/?v=1",
+    virtusInstagram: "virtusapex_",
   },
 
   // Números em destaque (faixa tirada do site a pedido; ficam guardados aqui)
